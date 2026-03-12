@@ -1,0 +1,2827 @@
+<style>
+:root {
+/ Core backgrounds (dark theme) /
+–bg0:  #060D09;   / Deepest background /
+–bg1:  #0A1610;   / Primary surface /
+–bg2:  #0D1C14;   / Elevated surface /
+–bg3:  #122218;   / Card surface /
+–bg4:  #182D1F;   / Hover surface */
+/* Brand greens — GADA */
+–g1: #1A4030;
+–g2: #235540;
+–g3: #2E6E52;
+–g4: #3A8A68;
+/* Gold — primary data accent */
+–gold:  #C4953A;
+–gold2: #D8A84E;
+–gold3: #F0C060;
+/* Status colors */
+–red:   #BF1A35;
+–red2:  #E03050;
+–amber: #D4820A;
+–green: #17A34A;
+–green2:#21C55C;
+–blue:  #2B7FD4;
+/* Text hierarchy /
+–t1: #DDE8DF;   / Primary text /
+–t2: #7FA88A;   / Secondary text /
+–t3: #3D6048;   / Tertiary / muted */
+/* Borders */
+–b1: #1A3025;
+–b2: #122018;
+/* Fonts */
+–ff-h: ‘Syne’, sans-serif;
+–ff-b: ‘IBM Plex Sans’, sans-serif;
+–ff-m: ‘IBM Plex Mono’, monospace;
+/* Spacing & shape */
+–r: 5px;
+–r2: 3px;
+–dur: 180ms;
+–ease: cubic-bezier(.4,0,.2,1);
+/* Shadows */
+–sh: 0 4px 32px rgba(0,0,0,.55);
+–sh2: 0 2px 12px rgba(0,0,0,.4);
+–glow-g: 0 0 24px rgba(196,149,58,.14);
+–glow-r: 0 0 12px rgba(191,26,53,.25);
+/* Rail width */
+–rail-w: 52px;
+–rail-w-exp: 210px;
+}
+/* Light theme overrides */
+[data-theme=“light”] {
+–bg0: #EAF0E8; –bg1: #F0F6EE; –bg2: #FFFFFF;
+–bg3: #F7FBF5; –bg4: #E8F0E5;
+–b1: #C8DEC0; –b2: #D8EAD0;
+–t1: #162A1C; –t2: #3D6048; –t3: #8AAA90;
+}
+/* ── BASE ── /
+,::before,::after{margin:0;padding:0;box-sizing:border-box}
+html{height:100%;font-size:13px;-webkit-text-size-adjust:100%}
+body{height:100%;overflow:hidden;font-family:var(–ff-b);background:var(–bg0);color:var(–t1);line-height:1.5}
+button,select,input,textarea{font-family:inherit;outline:none;border:none}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(–g1);border-radius:2px}
+img,svg{display:block}
+/* ── ICON SYSTEM ──
+Usage: <i class="ic" data-ic="alert"></i>
+Icons are rendered via JS using inline SVG paths
+Hover: grey → white transition
+Active: grey → gold
+── */
+.ic{
+display:inline-flex;align-items:center;justify-content:center;
+flex-shrink:0;color:var(–t3);
+transition:color var(–dur) var(–ease);
+pointer-events:none;
+}
+.ic svg{stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ic.s svg{width:13px;height:13px}
+.ic.m svg{width:15px;height:15px}
+.ic.l svg{width:18px;height:18px}
+.ic.xl svg{width:22px;height:22px}
+.ic.gold{color:var(–gold)}
+.ic.red{color:var(–red2)}
+.ic.green{color:var(–green2)}
+.ic.white{color:var(–t1)}
+/* ── STATUS INDICATORS ── */
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;display:inline-block}
+.dot.g{background:var(–green2);box-shadow:0 0 6px var(–green2)}
+.dot.a{background:var(–amber);box-shadow:0 0 6px var(–amber)}
+.dot.r{background:var(–red2);box-shadow:0 0 6px var(–red2)}
+.dot.pulse{animation:pulse 2.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}
+/* ── LAYOUT SHELL ── */
+.shell{display:flex;height:100vh;width:100vw;overflow:hidden;position:relative}
+/* ════════════════════════════════════════════
+RAIL NAVIGATION — LEFT SIDEBAR
+Collapses to icon-only, expands on hover
+════════════════════════════════════════════ */
+.rail{
+width:var(–rail-w);flex-shrink:0;
+background:var(–bg1);border-right:1px solid var(–b1);
+display:flex;flex-direction:column;align-items:center;
+padding:.5rem 0;z-index:100;overflow:hidden;
+transition:width var(–dur) var(–ease);
+}
+.rail:hover,.rail.pinned{width:var(–rail-w-exp)}
+/* LOGO PLACEHOLDER — replace src with your logo asset /
+.rail-logo{
+width:34px;height:34px;flex-shrink:0;border-radius:var(–r2);
+background:linear-gradient(135deg,var(–g1) 0%,var(–g3) 100%);
+border:1px solid var(–gold);display:flex;align-items:center;justify-content:center;
+font-family:var(–ff-h);font-weight:800;font-size:.72rem;letter-spacing:.05em;color:var(–gold);
+box-shadow:var(–glow-g);margin-bottom:.9rem;
+/ To use an image logo instead: /
+/ background-image: url(‘YOUR_LOGO_PATH_HERE’); background-size:cover; /
+}
+.rail-logo img{width:100%;height:100%;object-fit:contain;border-radius:var(–r2);display:none}
+/ Uncomment and set src to show image logo:
+.rail-logo img{display:block} */
+.rail-section-label{
+width:100%;padding:.2rem .95rem;
+font-family:var(–ff-m);font-size:.52rem;color:var(–t3);
+text-transform:uppercase;letter-spacing:.15em;
+white-space:nowrap;overflow:hidden;opacity:0;
+transition:opacity var(–dur);margin-top:.4rem;
+}
+.rail:hover .rail-section-label,.rail.pinned .rail-section-label{opacity:1}
+.rail-sep{width:28px;height:1px;background:var(–b1);margin:.3rem auto;flex-shrink:0;transition:width var(–dur)}
+.rail:hover .rail-sep,.rail.pinned .rail-sep{width:calc(var(–rail-w-exp) - 24px)}
+.ri{
+width:100%;padding:.52rem .85rem;
+display:flex;align-items:center;gap:.75rem;
+cursor:pointer;background:none;
+border:none;border-right:2px solid transparent;
+color:var(–t3);white-space:nowrap;overflow:hidden;
+transition:var(–dur) var(–ease);position:relative;text-align:left;
+}
+.ri:hover{background:var(–bg3);color:var(–t1);border-right-color:var(–b1)}
+.ri.active{background:var(–bg4);color:var(–t1);border-right-color:var(–gold)}
+.ri.active .ic{color:var(–gold)}
+.ri-label{font-size:.76rem;font-weight:500;opacity:0;transition:opacity var(–dur);flex:1}
+.rail:hover .ri-label,.rail.pinned .ri-label{opacity:1}
+.ri-badge{
+background:var(–red);color:#fff;border-radius:2px;
+padding:.08rem .32rem;font-family:var(–ff-m);font-size:.55rem;
+opacity:0;transition:opacity var(–dur);flex-shrink:0;
+}
+.rail:hover .ri-badge,.rail.pinned .ri-badge{opacity:1}
+.rail-foot{margin-top:auto;width:100%;border-top:1px solid var(–b1);padding:.5rem 0}
+.rail-status-row{
+padding:.3rem .85rem;display:flex;align-items:center;gap:.7rem;
+white-space:nowrap;overflow:hidden;
+}
+.rail-status-label{font-family:var(–ff-m);font-size:.6rem;color:var(–t3);opacity:0;transition:opacity var(–dur)}
+.rail:hover .rail-status-label,.rail.pinned .rail-status-label{opacity:1}
+/* ════════════════════════════════════════════
+MAIN CANVAS
+════════════════════════════════════════════ */
+.canvas{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+/* ── TOP COMMAND BAR ── */
+.cmdbar{
+height:42px;flex-shrink:0;
+background:var(–bg1);border-bottom:1px solid var(–b1);
+display:flex;align-items:center;gap:.5rem;padding:0 .8rem;z-index:50;
+}
+.cb-brand{display:flex;flex-direction:column;justify-content:center;padding-right:.7rem;border-right:1px solid var(–b1);flex-shrink:0}
+.cb-name{font-family:var(–ff-h);font-weight:700;font-size:.82rem;color:var(–t1);line-height:1.2}
+.cb-sub{font-family:var(–ff-m);font-size:.48rem;color:var(–t3);letter-spacing:.1em;text-transform:uppercase}
+.cb-kpi{
+display:flex;align-items:center;gap:.45rem;padding:0 .7rem;
+border-right:1px solid var(–b1);flex-shrink:0;
+}
+.cb-kpi-v{font-family:var(–ff-h);font-size:.9rem;font-weight:700}
+.cb-kpi-v.g{color:var(–green2)}.cb-kpi-v.r{color:var(–red2)}.cb-kpi-v.o{color:var(–gold2)}
+.cb-kpi-l{font-family:var(–ff-m);font-size:.52rem;color:var(–t3);line-height:1.3}
+.cb-sep{width:1px;height:18px;background:var(–b1);flex-shrink:0}
+.cb-gap{flex:1}
+.cb-search{position:relative;flex:1;max-width:300px}
+.cb-search input{
+width:100%;background:var(–bg2);border:1px solid var(–b1);
+border-radius:var(–r2);padding:.28rem .65rem .28rem 1.8rem;
+font-size:.76rem;color:var(–t1);transition:var(–dur);
+}
+.cb-search input::placeholder{color:var(–t3)}
+.cb-search input:focus{border-color:var(–gold);box-shadow:0 0 0 2px rgba(196,149,58,.08)}
+.cb-search-ic{position:absolute;left:.5rem;top:50%;transform:translateY(-50%)}
+.search-drop{
+position:absolute;top:calc(100% + 3px);left:0;right:0;z-index:999;
+background:var(–bg1);border:1px solid var(–b1);border-radius:var(–r);
+box-shadow:var(–sh);display:none;overflow:hidden;max-height:240px;overflow-y:auto;
+}
+.search-drop.open{display:block}
+.sd-item{
+padding:.42rem .7rem;font-size:.76rem;cursor:pointer;
+display:flex;align-items:center;gap:.5rem;transition:background var(–dur);
+}
+.sd-item:hover{background:var(–bg3)}
+.sd-tag{font-family:var(–ff-m);font-size:.58rem;color:var(–gold);min-width:40px}
+.cb-btn{
+display:flex;align-items:center;gap:.3rem;
+padding:.28rem .6rem;background:var(–bg2);border:1px solid var(–b1);
+border-radius:var(–r2);font-size:.7rem;color:var(–t2);cursor:pointer;
+transition:var(–dur) var(–ease);flex-shrink:0;white-space:nowrap;
+}
+.cb-btn:hover{background:var(–bg3);color:var(–t1)}
+.cb-btn.active{border-color:var(–gold);color:var(–gold)}
+.cb-role{
+background:var(–bg2);border:1px solid var(–b1);border-radius:var(–r2);
+padding:.28rem .45rem;font-size:.7rem;color:var(–t2);cursor:pointer;
+font-family:var(–ff-m);transition:var(–dur);
+}
+.cb-role:hover{border-color:var(–gold);color:var(–gold)}
+.clock{font-family:var(–ff-m);font-size:.66rem;color:var(–t3);padding-left:.5rem;flex-shrink:0}
+/* ── TICKER STRIP ── */
+.ticker{
+height:26px;flex-shrink:0;background:var(–bg2);border-bottom:1px solid var(–b1);
+overflow:hidden;position:relative;display:flex;align-items:center;
+}
+.ticker::before,.ticker::after{
+content:’’;position:absolute;top:0;bottom:0;width:60px;z-index:2;pointer-events:none;
+}
+.ticker::before{left:0;background:linear-gradient(to right,var(–bg2),transparent)}
+.ticker::after{right:0;background:linear-gradient(to left,var(–bg2),transparent)}
+.ticker-inner{
+display:flex;gap:2.5rem;white-space:nowrap;
+animation:tickScroll 50s linear infinite;width:max-content;padding:0 2rem;
+}
+.ticker-inner:hover{animation-play-state:paused}
+@keyframes tickScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.tk{display:flex;align-items:center;gap:.4rem;font-family:var(–ff-m);font-size:.62rem}
+.tk-l{color:var(–t3)}.tk-v{color:var(–t1)}.tk-up{color:var(–green2)}.tk-dn{color:var(–red2)}
+/* ── VIEW AREA ── */
+.varea{flex:1;overflow:hidden;position:relative}
+.view{display:none;height:100%;flex-direction:column;overflow:hidden}
+.view.active{display:flex}
+/* ── VIEW HEADER ── */
+.vh{
+height:48px;flex-shrink:0;padding:0 1rem;
+background:var(–bg1);border-bottom:1px solid var(–b1);
+display:flex;align-items:center;gap:.8rem;
+}
+.vh-title{font-family:var(–ff-h);font-size:.9rem;font-weight:700;color:var(–t1)}
+.vh-sub{font-size:.66rem;color:var(–t3)}
+.vh-pill{
+display:flex;align-items:center;gap:.3rem;
+padding:.14rem .5rem;border-radius:2px;font-family:var(–ff-m);font-size:.58rem;
+}
+.vh-pill.crit{background:rgba(191,26,53,.1);border:1px solid rgba(191,26,53,.25);color:var(–red2)}
+.vh-pill.warn{background:rgba(212,130,10,.1);border:1px solid rgba(212,130,10,.25);color:var(–amber)}
+.vh-pill.ok{background:rgba(23,163,74,.1);border:1px solid rgba(23,163,74,.25);color:var(–green2)}
+.vh-actions{margin-left:auto;display:flex;gap:.35rem;align-items:center}
+/* ── BUTTONS ── */
+.btn{
+display:inline-flex;align-items:center;gap:.3rem;
+padding:.32rem .75rem;border-radius:var(–r2);font-size:.72rem;
+cursor:pointer;transition:var(–dur) var(–ease);border:1px solid transparent;
+font-family:var(–ff-b);white-space:nowrap;
+}
+.btn-p{background:var(–gold);color:var(–bg0);font-weight:600;border-color:var(–gold)}
+.btn-p:hover{background:var(–gold2);box-shadow:var(–glow-g)}
+.btn-s{background:var(–bg2);border-color:var(–b1);color:var(–t2)}
+.btn-s:hover{background:var(–bg3);color:var(–t1);border-color:var(–g1)}
+.btn-d{background:rgba(191,26,53,.06);border-color:rgba(191,26,53,.22);color:var(–red2)}
+.btn-d:hover{background:rgba(191,26,53,.12)}
+/* ── SCROLLABLE VIEW CONTENT ── */
+.vc{flex:1;overflow-y:auto;padding:1rem}
+.vc.np{padding:0;overflow:hidden;display:flex;flex-direction:column}
+/* ── METRIC STRIP (KPI row) ── */
+.ms{display:flex;border:1px solid var(–b1);border-radius:var(–r);overflow:hidden;flex-shrink:0;margin-bottom:.85rem}
+.ms-c{flex:1;padding:.65rem .85rem;background:var(–bg2);border-right:1px solid var(–b1);transition:background var(–dur);cursor:default}
+.ms-c:last-child{border-right:none}
+.ms-c:hover{background:var(–bg3)}
+.ms-l{font-family:var(–ff-m);font-size:.52rem;color:var(–t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.28rem}
+.ms-v{font-family:var(–ff-h);font-size:1.35rem;font-weight:700;line-height:1;color:var(–t1)}
+.ms-v.g{color:var(–green2)}.ms-v.r{color:var(–red2)}.ms-v.o{color:var(–gold2)}.ms-v.a{color:var(–amber)}
+.ms-d{font-size:.63rem;color:var(–t3);margin-top:.22rem}
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto;border:1px solid var(–b1);border-radius:var(–r);flex-shrink:0}
+table{width:100%;border-collapse:collapse}
+thead th{
+padding:.45rem .75rem;text-align:left;
+font-family:var(–ff-m);font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;
+color:var(–t3);font-weight:500;border-bottom:1px solid var(–b1);
+background:var(–bg2);position:sticky;top:0;z-index:1;white-space:nowrap;
+}
+tbody td{padding:.48rem .75rem;border-bottom:1px solid var(–b2);font-size:.76rem;vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr{cursor:pointer;transition:background var(–dur)}
+tbody tr:hover td{background:var(–bg3)}
+tbody tr.sel td{background:var(–bg4);border-left:2px solid var(–gold)}
+.mono{font-family:var(–ff-m);font-size:.68rem}
+/* ── TAGS ── */
+.tag{display:inline-flex;align-items:center;gap:.2rem;padding:.1rem .42rem;border-radius:2px;font-family:var(–ff-m);font-size:.58rem;white-space:nowrap}
+.tg{background:rgba(23,163,74,.1);color:var(–green2);border:1px solid rgba(23,163,74,.18)}
+.ta{background:rgba(212,130,10,.1);color:var(–amber);border:1px solid rgba(212,130,10,.18)}
+.tr{background:rgba(191,26,53,.1);color:var(–red2);border:1px solid rgba(191,26,53,.18)}
+.to{background:rgba(196,149,58,.1);color:var(–gold2);border:1px solid rgba(196,149,58,.18)}
+.tk2{background:rgba(127,168,138,.08);color:var(–t2);border:1px solid rgba(127,168,138,.15)}
+/* ── HEALTH BAR ── */
+.hbar{width:52px;height:3px;background:var(–b1);border-radius:2px;overflow:hidden;display:inline-block;vertical-align:middle}
+.hfill{height:100%;border-radius:2px;transition:width .4s}
+/* ── CHART GRID ── */
+.cg{display:grid;gap:1px;border:1px solid var(–b1);border-radius:var(–r);overflow:hidden;flex-shrink:0;margin-bottom:.85rem}
+.cg2{grid-template-columns:1fr 1fr}
+.cg3{grid-template-columns:1fr 1fr 1fr}
+.cc{background:var(–bg2);padding:.8rem}
+.cc-t{font-family:var(–ff-h);font-size:.76rem;font-weight:700;color:var(–t1);margin-bottom:.08rem}
+.cc-s{font-size:.6rem;color:var(–t3);margin-bottom:.6rem}
+.cc-w{position:relative}
+/* ════════════════════════════════════════════
+MAP VIEW
+════════════════════════════════════════════ */
+#map{flex:1;z-index:1;background:var(–bg0)}
+.leaflet-container{background:var(–bg0) !important}
+/* Map overlay: stats panel (top-left floating glass) */
+.map-stats{
+position:absolute;top:.75rem;left:.75rem;z-index:500;
+background:rgba(10,22,16,.88);border:1px solid var(–b1);
+border-radius:var(–r);padding:.7rem .85rem;min-width:186px;
+backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+}
+.mst{font-family:var(–ff-h);font-size:.82rem;font-weight:700;color:var(–t1);margin-bottom:.5rem}
+.msr{display:flex;justify-content:space-between;align-items:center;margin-bottom:.25rem}
+.msk{font-size:.65rem;color:var(–t3)}
+.msv{font-family:var(–ff-m);font-size:.7rem;color:var(–t1)}
+.msv.g{color:var(–green2)}.msv.r{color:var(–red2)}.msv.o{color:var(–gold2)}
+.map-weather{
+position:absolute;top:.75rem;left:50%;transform:translateX(-50%);z-index:500;
+background:rgba(10,22,16,.88);border:1px solid var(–b1);
+border-radius:var(–r2);padding:.32rem .7rem;
+display:flex;align-items:center;gap:.6rem;
+backdrop-filter:blur(16px);font-family:var(–ff-m);font-size:.65rem;color:var(–t2);
+}
+/* Map controls (right side floating) */
+.map-ctrls{
+position:absolute;top:.75rem;right:.75rem;z-index:500;
+display:flex;flex-direction:column;gap:.3rem;
+}
+.mc-btn{
+display:flex;align-items:center;gap:.4rem;padding:.36rem .65rem;
+background:rgba(10,22,16,.88);border:1px solid var(–b1);border-radius:var(–r2);
+font-family:var(–ff-m);font-size:.65rem;color:var(–t2);cursor:pointer;
+backdrop-filter:blur(12px);transition:var(–dur);white-space:nowrap;
+}
+.mc-btn:hover{background:rgba(18,32,24,.95);color:var(–t1)}
+.mc-btn.active{border-color:rgba(196,149,58,.45);color:var(–gold2);background:rgba(18,32,24,.95)}
+/* Time slider bar */
+.tsbar{
+height:46px;flex-shrink:0;background:var(–bg1);border-top:1px solid var(–b1);
+display:flex;align-items:center;gap:.7rem;padding:0 .9rem;
+}
+.ts-date{font-family:var(–ff-h);font-weight:700;font-size:.9rem;color:var(–gold);min-width:116px;flex-shrink:0}
+.ts-play{
+width:28px;height:28px;background:var(–bg3);border:1px solid var(–b1);
+border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;
+flex-shrink:0;transition:var(–dur);
+}
+.ts-play:hover{background:var(–gold);border-color:var(–gold)}
+.ts-play:hover .ic{color:var(–bg0)}
+input[type=range]{
+-webkit-appearance:none;flex:1;height:2px;background:var(–b1);
+border-radius:1px;cursor:pointer;accent-color:var(–gold);
+}
+input[type=range]::-webkit-slider-thumb{
+-webkit-appearance:none;width:12px;height:12px;
+background:var(–gold);border-radius:50%;border:none;
+}
+.ts-lbl{font-family:var(–ff-m);font-size:.58rem;color:var(–t3);flex-shrink:0}
+.ts-reset{
+padding:.2rem .55rem;background:transparent;border:1px solid var(–b1);
+border-radius:var(–r2);font-size:.62rem;font-family:var(–ff-m);color:var(–t3);
+cursor:pointer;transition:var(–dur);flex-shrink:0;
+}
+.ts-reset:hover{border-color:var(–gold);color:var(–gold)}
+/* Leaflet popup overrides */
+.leaflet-popup-content-wrapper{
+background:var(–bg1) !important;border:1px solid var(–b1) !important;
+border-radius:var(–r) !important;box-shadow:var(–sh) !important;padding:0 !important;
+}
+.leaflet-popup-content{margin:0 !important;font-family:var(–ff-b)}
+.leaflet-popup-tip{background:var(–bg1) !important}
+.fpop{padding:.65rem .8rem;min-width:170px}
+.fpop-name{font-family:var(–ff-h);font-size:.82rem;font-weight:700;color:var(–t1);margin-bottom:.42rem}
+.fpop-row{display:flex;justify-content:space-between;font-size:.7rem;margin-bottom:.2rem}
+.fpop-k{color:var(–t3)}.fpop-v{font-family:var(–ff-m);color:var(–t1)}
+.fpop-btn{
+width:100%;margin-top:.48rem;padding:.32rem;background:var(–gold);
+border:none;border-radius:2px;font-size:.7rem;font-weight:600;
+cursor:pointer;font-family:var(–ff-b);color:var(–bg0);transition:var(–dur);
+}
+.fpop-btn:hover{background:var(–gold2)}
+.leaflet-control-zoom{border:1px solid var(–b1) !important;border-radius:var(–r2) !important;overflow:hidden}
+.leaflet-control-zoom a{background:var(–bg1) !important;color:var(–t2) !important;border-bottom:1px solid var(–b1) !important;line-height:22px !important}
+.leaflet-control-zoom a:hover{background:var(–bg3) !important;color:var(–t1) !important}
+/* ════════════════════════════════════════════
+DRAWER (Entity detail + AI Chat)
+════════════════════════════════════════════ */
+.drawer{
+position:absolute;top:0;right:0;bottom:0;width:300px;
+background:var(–bg1);border-left:1px solid var(–b1);
+display:flex;flex-direction:column;
+transform:translateX(100%);transition:transform .22s var(–ease);
+z-index:200;box-shadow:var(–sh);
+}
+.drawer.open{transform:translateX(0)}
+.dr-head{
+height:42px;flex-shrink:0;padding:0 .8rem;
+display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(–b1);
+}
+.dr-title{font-family:var(–ff-h);font-size:.8rem;font-weight:700;flex:1;color:var(–t1)}
+.dr-close{background:none;border:none;cursor:pointer;padding:.2rem;display:flex;align-items:center;color:var(–t3);transition:color var(–dur)}
+.dr-close:hover{color:var(–t1)}
+.dr-body{flex:1;overflow-y:auto;padding:.75rem}
+.dr-sec{
+font-family:var(–ff-m);font-size:.52rem;color:var(–t3);
+text-transform:uppercase;letter-spacing:.14em;
+margin:.75rem 0 .35rem;padding-bottom:.28rem;border-bottom:1px solid var(–b1);
+}
+.dr-row{display:flex;justify-content:space-between;align-items:center;padding:.28rem 0;border-bottom:1px solid var(–b2);font-size:.73rem}
+.dr-row:last-child{border:none}
+.dr-k{color:var(–t3)}.dr-v{font-family:var(–ff-m);font-size:.68rem;color:var(–t1)}
+.pred-box{
+background:rgba(196,149,58,.04);border:1px solid rgba(196,149,58,.2);
+border-radius:var(–r2);padding:.65rem .75rem;margin-top:.6rem;
+}
+.pred-title{font-family:var(–ff-m);font-size:.52rem;color:var(–gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.28rem}
+.pred-pct{font-family:var(–ff-h);font-size:1.4rem;font-weight:700;color:var(–gold2)}
+.pred-body{font-size:.72rem;color:var(–t2);line-height:1.65;margin-top:.28rem}
+/* AI Chat section */
+.chat{border-top:1px solid var(–b1);display:flex;flex-direction:column;height:310px;flex-shrink:0}
+.chat-head{
+padding:.45rem .75rem;border-bottom:1px solid var(–b1);
+display:flex;align-items:center;gap:.45rem;flex-shrink:0;
+}
+.chat-av{
+width:24px;height:24px;border-radius:3px;flex-shrink:0;
+background:linear-gradient(135deg,var(–g2),var(–gold));
+display:flex;align-items:center;justify-content:center;
+font-family:var(–ff-h);font-weight:800;font-size:.58rem;color:var(–bg0);
+}
+.chat-name{font-size:.74rem;font-weight:600;color:var(–t1)}
+.chat-online{font-family:var(–ff-m);font-size:.56rem;color:var(–green2);display:flex;align-items:center;gap:.22rem}
+.chat-online::before{content:’’;width:4px;height:4px;background:var(–green2);border-radius:50%;animation:pulse 2s infinite}
+.chat-qp{display:flex;flex-wrap:wrap;gap:.22rem;padding:.38rem .65rem .1rem;flex-shrink:0}
+.qp{
+font-size:.58rem;padding:.14rem .42rem;background:var(–bg2);
+border:1px solid var(–b1);border-radius:2px;cursor:pointer;color:var(–t3);
+transition:var(–dur);font-family:var(–ff-b);
+}
+.qp:hover{border-color:var(–gold);color:var(–gold)}
+.chat-msgs{flex:1;overflow-y:auto;padding:.45rem .65rem;display:flex;flex-direction:column;gap:.38rem}
+.msg{max-width:92%}
+.msg.ai{align-self:flex-start}.msg.user{align-self:flex-end}
+.msg-b{padding:.42rem .6rem;border-radius:5px;font-size:.73rem;line-height:1.6}
+.msg.ai .msg-b{background:var(–bg3);border:1px solid var(–b1);color:var(–t1);border-radius:3px 5px 5px 5px}
+.msg.user .msg-b{background:var(–bg4);color:var(–t1);border-radius:5px 3px 5px 5px}
+.msg-t{font-family:var(–ff-m);font-size:.52rem;color:var(–t3);margin-top:.12rem}
+.msg.user .msg-t{text-align:right}
+.typing{display:flex;gap:.22rem;padding:.42rem .6rem;background:var(–bg3);border:1px solid var(–b1);border-radius:3px 5px 5px 5px;width:fit-content}
+.typing span{width:4px;height:4px;background:var(–t3);border-radius:50%;animation:tb 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+@keyframes tb{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-4px);opacity:1}}
+.chat-in{padding:.45rem .65rem;border-top:1px solid var(–b1);display:flex;gap:.35rem;flex-shrink:0}
+.chat-input{
+flex:1;background:var(–bg2);border:1px solid var(–b1);border-radius:var(–r2);
+padding:.35rem .6rem;font-size:.73rem;color:var(–t1);resize:none;
+transition:border-color var(–dur);
+}
+.chat-input:focus{border-color:var(–gold)}
+.chat-send{
+width:30px;height:30px;background:var(–gold);border:none;border-radius:var(–r2);
+cursor:pointer;display:flex;align-items:center;justify-content:center;transition:var(–dur);
+}
+.chat-send:hover{background:var(–gold2);box-shadow:var(–glow-g)}
+/* ── ALERT LIST ── */
+.al-list{display:flex;flex-direction:column;gap:2px;flex-shrink:0}
+.al{
+background:var(–bg2);border:1px solid var(–b1);border-left:2px solid var(–b1);
+border-radius:var(–r2);padding:.6rem .8rem;cursor:pointer;
+transition:var(–dur);display:flex;align-items:flex-start;gap:.65rem;
+}
+.al:hover{background:var(–bg3);border-left-color:var(–gold)}
+.al.crit{border-left-color:var(–red2)}
+.al.warn{border-left-color:var(–amber)}
+.al.info{border-left-color:var(–gold)}
+.al.sel{background:var(–bg4);border-left-color:var(–gold)}
+.al-ic-wrap{flex-shrink:0;margin-top:.12rem}
+.al-body{flex:1;min-width:0}
+.al-title{font-size:.78rem;font-weight:500;color:var(–t1);margin-bottom:.12rem}
+.al-meta{font-family:var(–ff-m);font-size:.6rem;color:var(–t3);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.conf-bar{width:48px;height:2px;background:var(–b1);border-radius:1px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:.18rem}
+.conf-fill{height:100%;background:var(–gold);border-radius:1px}
+.al-desc{font-size:.71rem;color:var(–t2);line-height:1.6;margin-top:.3rem}
+.al-acts{display:flex;gap:.28rem;margin-top:.42rem;flex-wrap:wrap}
+/* ── POULTRY GRID ── */
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:1px;border:1px solid var(–b1);border-radius:var(–r);overflow:hidden}
+.pg-c{
+background:var(–bg2);padding:.75rem;cursor:pointer;
+transition:background var(–dur);border-right:2px solid transparent;
+}
+.pg-c:hover{background:var(–bg3)}
+.pg-c.ok{border-right-color:var(–green2)}.pg-c.warn{border-right-color:var(–amber)}.pg-c.crit{border-right-color:var(–red2)}
+.pg-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.55rem}
+.pg-name{font-size:.76rem;font-weight:500;color:var(–t1)}
+.pg-id{font-family:var(–ff-m);font-size:.58rem;color:var(–t3);margin-top:.08rem}
+.pg-met{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.35rem;margin-bottom:.45rem}
+.pg-m{background:var(–bg1);border-radius:2px;padding:.3rem .35rem;text-align:center}
+.pg-ml{font-family:var(–ff-m);font-size:.52rem;color:var(–t3)}
+.pg-mv{font-family:var(–ff-h);font-size:.88rem;font-weight:700;color:var(–t1)}
+.pg-mv.hi{color:var(–red2)}
+.pg-ahi{display:flex;justify-content:space-between;align-items:center;padding-top:.42rem;border-top:1px solid var(–b1)}
+.pg-ahi-n{font-family:var(–ff-h);font-size:1.15rem;font-weight:700}
+/* ── BREEDING SIMULATOR ── */
+.breed-box{border:1px solid var(–b1);border-radius:var(–r);overflow:hidden;margin-bottom:.85rem}
+.breed-head{padding:.6rem .85rem;background:var(–bg2);border-bottom:1px solid var(–b1);font-family:var(–ff-h);font-size:.8rem;font-weight:700}
+.breed-inner{display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;border-top:none}
+.bc{padding:.75rem;background:var(–bg2);border-right:1px solid var(–b1)}
+.bc:last-child{border-right:none}
+.bc.offspring{background:rgba(196,149,58,.03);border:1px solid rgba(196,149,58,.18) !important}
+.bc-arr{display:flex;align-items:center;justify-content:center;background:var(–bg1);color:var(–t3);font-size:.78rem}
+.bc-lbl{font-family:var(–ff-m);font-size:.52rem;color:var(–t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem}
+.bc-naid{font-family:var(–ff-m);font-size:.62rem;color:var(–gold);margin-bottom:.12rem}
+.bc-name{font-size:.78rem;font-weight:500;margin-bottom:.32rem}
+.bc-bvs{font-family:var(–ff-h);font-size:1.75rem;font-weight:700;color:var(–gold2);line-height:1}
+.bc-bvs-l{font-size:.58rem;color:var(–t3)}
+.bc-dims{display:grid;grid-template-columns:1fr 1fr;gap:.28rem;margin-top:.55rem}
+.bd{background:var(–bg1);border-radius:2px;padding:.28rem .35rem}
+.bd-l{font-family:var(–ff-m);font-size:.52rem;color:var(–t3)}
+.bd-v{font-family:var(–ff-h);font-size:.8rem;font-weight:700;color:var(–t1)}
+/* ── LEGAL SPLIT ── */
+.lsplit{display:flex;height:100%;overflow:hidden}
+.ltree{width:215px;flex-shrink:0;border-right:1px solid var(–b1);overflow-y:auto;background:var(–bg2)}
+.lt-yr{padding:.38rem .75rem;font-family:var(–ff-m);font-size:.68rem;color:var(–t3);cursor:pointer;transition:var(–dur);display:flex;align-items:center;gap:.35rem;border-bottom:1px solid var(–b2)}
+.lt-yr:hover{color:var(–t1);background:var(–bg3)}
+.lt-laws{display:none;background:var(–bg1)}
+.lt-law{padding:.36rem .75rem .36rem 1.3rem;font-size:.7rem;color:var(–t3);cursor:pointer;transition:var(–dur);border-bottom:1px solid var(–b2)}
+.lt-law:hover{color:var(–gold);background:var(–bg3)}
+.lt-law.active{color:var(–gold);background:var(–bg4)}
+.lcontent{flex:1;overflow-y:auto;padding:.9rem 1rem}
+.lai-box{background:rgba(196,149,58,.03);border:1px solid rgba(196,149,58,.18);border-radius:var(–r2);padding:.65rem .8rem;margin-bottom:.8rem}
+.lai-l{font-family:var(–ff-m);font-size:.52rem;color:var(–gold);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.28rem}
+.lbody{font-size:.79rem;line-height:1.88;color:var(–t2)}
+/* ── BLOCKCHAIN ── */
+.bl-row{display:flex;align-items:center;gap:.75rem;padding:.48rem .75rem;border-bottom:1px solid var(–b2);cursor:pointer;transition:background var(–dur)}
+.bl-row:hover{background:var(–bg3)}
+.bl-n{font-family:var(–ff-h);font-weight:700;font-size:.9rem;color:var(–gold);min-width:54px}
+.bl-hash{font-family:var(–ff-m);font-size:.6rem;color:var(–t3);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bl-tx{font-family:var(–ff-m);font-size:.65rem;color:var(–t2);white-space:nowrap}
+.verify-strip{border:1px solid var(–b1);border-radius:var(–r);padding:.75rem;margin-bottom:.85rem}
+.vi{
+width:100%;background:var(–bg1);border:1px solid var(–b1);border-radius:var(–r2);
+padding:.4rem .65rem;font-family:var(–ff-m);font-size:.73rem;color:var(–t1);margin:.35rem 0;
+transition:border-color var(–dur);
+}
+.vi:focus{border-color:var(–gold)}
+.vr{background:rgba(23,163,74,.05);border:1px solid rgba(23,163,74,.18);border-radius:var(–r2);padding:.55rem .75rem;margin-top:.38rem;font-family:var(–ff-m);font-size:.7rem;display:none}
+.vr.show{display:block}
+/* ── EID CARD ── */
+.eid-card{
+border:1px solid rgba(196,149,58,.32);border-radius:var(–r);
+background:linear-gradient(135deg,rgba(196,149,58,.05) 0%,rgba(196,149,58,.01) 100%);
+padding:.85rem;margin-bottom:.85rem;position:relative;overflow:hidden;
+}
+.eid-card::after{content:’’;position:absolute;top:-24px;right:-24px;width:90px;height:90px;border-radius:50%;background:rgba(196,149,58,.05);pointer-events:none}
+.eid-lbl{font-family:var(–ff-m);font-size:.52rem;color:var(–gold);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.22rem}
+.eid-days{font-family:var(–ff-h);font-size:2.1rem;font-weight:700;color:var(–gold2);line-height:1;margin-bottom:.28rem}
+.eid-sub{font-size:.72rem;color:var(–t2);line-height:1.7}
+.eid-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;margin-top:.65rem;border:1px solid var(–b1);border-radius:var(–r2);overflow:hidden}
+.eid-s{background:rgba(0,0,0,.2);padding:.38rem .5rem;text-align:center}
+.eid-sv{font-family:var(–ff-h);font-weight:700;font-size:.88rem;color:var(–t1)}
+.eid-sl{font-family:var(–ff-m);font-size:.52rem;color:var(–t3);text-transform:uppercase;letter-spacing:.08em}
+/* ── SECURITY LOG ── */
+.slog{font-family:var(–ff-m);font-size:.62rem;color:var(–t3);background:var(–bg1);border-radius:var(–r2);padding:.55rem .7rem;max-height:110px;overflow-y:auto;border:1px solid var(–b1)}
+.slog-line{margin-bottom:.15rem}
+.slog-t{color:var(–gold2)}.slog-ok{color:var(–green2)}.slog-warn{color:var(–red2)}
+/* ── THREAT ROW ── */
+.thr-row{display:flex;align-items:center;gap:.55rem;padding:.45rem .7rem;border-bottom:1px solid var(–b2);font-size:.73rem;cursor:pointer;transition:background var(–dur)}
+.thr-row:hover{background:var(–bg3)}
+.ts-bl{background:rgba(23,163,74,.08);color:var(–green2);border:1px solid rgba(23,163,74,.18);padding:.1rem .38rem;border-radius:2px;font-family:var(–ff-m);font-size:.56rem}
+.ts-in{background:rgba(212,130,10,.08);color:var(–amber);border:1px solid rgba(212,130,10,.18);padding:.1rem .38rem;border-radius:2px;font-family:var(–ff-m);font-size:.56rem}
+.ts-ok{background:rgba(127,168,138,.08);color:var(–t2);border:1px solid rgba(127,168,138,.15);padding:.1rem .38rem;border-radius:2px;font-family:var(–ff-m);font-size:.56rem}
+/* ── ADMIN GRID ── */
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:1px;border:1px solid var(–b1);border-radius:var(–r);overflow:hidden;margin-bottom:.85rem}
+.ac{background:var(–bg2);padding:.75rem}
+.am{display:flex;justify-content:space-between;align-items:center;padding:.32rem 0;border-bottom:1px solid var(–b2);font-size:.73rem}
+.am:last-child{border:none}
+.amv{font-family:var(–ff-m);font-size:.68rem;color:var(–gold2)}
+.debug{font-family:var(–ff-m);font-size:.6rem;color:var(–t3);background:var(–bg1);border-radius:var(–r2);padding:.55rem .7rem;max-height:130px;overflow-y:auto;border:1px solid var(–b1)}
+/* ── FARMER PORTAL ── */
+.farm-wrap{max-width:400px;margin:0 auto}
+.task-row{display:flex;align-items:flex-start;gap:.65rem;padding:.6rem .75rem;border-bottom:1px solid var(–b2);cursor:pointer;transition:background var(–dur)}
+.task-row:hover{background:var(–bg3)}
+.task-text{flex:1;font-size:.78rem;color:var(–t1);line-height:1.55}
+.voice-btn{
+width:100%;margin-top:.75rem;padding:.75rem;
+background:rgba(196,149,58,.03);border:1px solid rgba(196,149,58,.22);
+border-radius:var(–r);display:flex;align-items:center;justify-content:center;gap:.55rem;
+cursor:pointer;transition:var(–dur);font-size:.78rem;color:var(–gold2);font-family:var(–ff-b);
+}
+.voice-btn:hover{background:rgba(196,149,58,.08);box-shadow:var(–glow-g)}
+/* ════════════════════════════════════════════
+MODAL
+════════════════════════════════════════════ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:999;display:none;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(–bg1);border:1px solid var(–b1);border-radius:var(–r);width:480px;max-width:90vw;max-height:86vh;overflow:hidden;display:flex;flex-direction:column}
+.modal-h{padding:.75rem 1rem;border-bottom:1px solid var(–b1);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-title{font-family:var(–ff-h);font-size:.88rem;font-weight:700}
+.modal-close{background:none;border:none;cursor:pointer;color:var(–t3);font-size:1rem;transition:color var(–dur)}
+.modal-close:hover{color:var(–t1)}
+.modal-body{padding:.9rem;overflow-y:auto;flex:1}
+.live-badge{display:flex;align-items:center;gap:.28rem;background:rgba(191,26,53,.08);border:1px solid rgba(191,26,53,.22);border-radius:2px;padding:.15rem .45rem;font-family:var(–ff-m);font-size:.6rem;color:var(–red2)}
+.live-dot{width:5px;height:5px;background:var(–red2);border-radius:50%;animation:pulse 1s infinite}
+.cam-frame{width:100%;aspect-ratio:16/9;background:var(–bg0);border:1px solid var(–b1);border-radius:var(–r2);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;margin-bottom:.55rem}
+.cam-scan{position:absolute;top:0;left:0;right:0;height:1px;background:rgba(196,149,58,.35);animation:scan 3.5s linear infinite;pointer-events:none}
+@keyframes scan{0%{top:0}100%{top:100%}}
+.cam-lbl{position:absolute;bottom:.45rem;left:.45rem;font-family:var(–ff-m);font-size:.56rem;color:var(–gold);background:rgba(0,0,0,.7);padding:.1rem .38rem;border-radius:2px}
+.cam-corner{position:absolute;width:16px;height:16px;border-color:var(–gold);border-style:solid;opacity:.6}
+.cam-corner.tl{top:.4rem;left:.4rem;border-width:1.5px 0 0 1.5px}
+.cam-corner.tr{top:.4rem;right:.4rem;border-width:1.5px 1.5px 0 0}
+.cam-corner.bl{bottom:.4rem;left:.4rem;border-width:0 0 1.5px 1.5px}
+.cam-corner.br{bottom:.4rem;right:.4rem;border-width:0 1.5px 1.5px 0}
+/* PDF progress */
+.pdf-bar{height:2px;background:var(–b1);border-radius:1px;overflow:hidden;margin:.65rem 0}
+.pdf-fill{height:100%;background:var(–gold);border-radius:1px;width:0;transition:width .18s}
+.pdf-st{font-family:var(–ff-m);font-size:.62rem;color:var(–t3)}
+/* ════════════════════════════════════════════
+TOAST NOTIFICATION
+════════════════════════════════════════════ */
+.toast{
+position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(12px);
+background:var(–bg1);border:1px solid var(–b1);border-radius:var(–r2);
+padding:.5rem .9rem;font-size:.76rem;box-shadow:var(–sh);z-index:9999;
+opacity:0;transition:all .22s var(–ease);pointer-events:none;white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.gold{border-color:rgba(196,149,58,.4);color:var(–gold2)}
+.toast.red{border-color:rgba(191,26,53,.3);color:var(–red2)}
+.toast.green{border-color:rgba(23,163,74,.3);color:var(–green2)}
+/* ════════════════════════════════════════════
+RESPONSIVE DESIGN
+════════════════════════════════════════════ /
+@media(max-width:1024px){
+.cb-kpi:nth-child(n+6){display:none}
+.cb-search{max-width:200px}
+}
+@media(max-width:768px){
+:root{–rail-w:0px;–rail-w-exp:220px}
+.rail{position:absolute;z-index:300;height:100%;box-shadow:var(–sh)}
+.rail:not(.open){width:0;padding:0;border:none}
+.rail.open{width:var(–rail-w-exp)}
+.mobile-menu-btn{display:flex !important}
+.cb-kpi{display:none}
+.ms-c:nth-child(n+4){display:none}
+}
+@media(max-width:480px){
+.cb-search,.cb-btn:not(.essential),.cb-role{display:none}
+.modal{max-width:95vw}
+.drawer{width:100%}
+.ms-c:nth-child(n+3){display:none}
+.cg2,.cg3{grid-template-columns:1fr}
+}
+@media(max-width:280px){
+/ Truly minimal: Apple Watch territory */
+.cmdbar{padding:0 .35rem;gap:.25rem;height:36px}
+.cb-name{font-size:.68rem}
+.cb-sub,.clock{display:none}
+.vh-actions{display:none}
+}
+.mobile-menu-btn{display:none;background:none;border:none;cursor:pointer;color:var(–t2);margin-right:.3rem;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="shell"><!-- ════════════════════════════════════════════
+     RAIL — NAVIGATION SIDEBAR
+     ════════════════════════════════════════════ --><nav class="rail" id="rail" role="navigation" aria-label="Main navigation"><!-- LOGO PLACEHOLDER
+       To use image: <img src="YOUR_LOGO.png" alt="GADA Logo"/>
+       Current: text logo initials --><div class="rail-logo" title="GADA — Sentinel Agricultural Intelligence System">
+    SA
+    <img src="" alt="GADA Logo"/>
+  </div><button class="ri active" onclick="nav('map')" id="ri-map" aria-label="National Map" title="National Map">
+    <span class="ic m" id="ic-map"></span>
+    <span class="ri-label">National Map</span>
+  </button><button class="ri" onclick="nav('herd')" id="ri-herd" aria-label="Herd Intelligence" title="Herd Intelligence">
+    <span class="ic m" id="ic-herd"></span>
+    <span class="ri-label">Herd Intelligence</span>
+    <span class="ri-badge" id="herd-badge">3</span>
+  </button><button class="ri" onclick="nav('health')" id="ri-health" aria-label="Health Surveillance" title="Health Surveillance">
+    <span class="ic m" id="ic-health"></span>
+    <span class="ri-label">Health Surveillance</span>
+    <span class="ri-badge" id="health-badge">3</span>
+  </button><button class="ri" onclick="nav('financial')" id="ri-financial" aria-label="Financial Command" title="Financial Command">
+    <span class="ic m" id="ic-financial"></span>
+    <span class="ri-label">Financial Command</span>
+  </button><button class="ri" onclick="nav('poultry')" id="ri-poultry" aria-label="Poultry Network" title="Poultry Network">
+    <span class="ic m" id="ic-poultry"></span>
+    <span class="ri-label">Poultry Network</span>
+  </button><button class="ri" onclick="nav('genetic')" id="ri-genetic" aria-label="Genetic AI" title="Genetic AI">
+    <span class="ic m" id="ic-genetic"></span>
+    <span class="ri-label">Genetic AI</span>
+  </button><button class="ri" onclick="nav('legal')" id="ri-legal" aria-label="Legal & Policy" title="Legal & Policy">
+    <span class="ic m" id="ic-legal"></span>
+    <span class="ri-label">Legal &amp; Policy</span>
+  </button><button class="ri" onclick="nav('security')" id="ri-security" aria-label="Security Posture" title="Security Posture">
+    <span class="ic m" id="ic-security"></span>
+    <span class="ri-label">Security Posture</span>
+  </button><button class="ri" onclick="nav('blockchain')" id="ri-blockchain" aria-label="Blockchain Ledger" title="Blockchain Ledger">
+    <span class="ic m" id="ic-blockchain"></span>
+    <span class="ri-label">Blockchain Ledger</span>
+  </button><button class="ri" onclick="nav('carbon')" id="ri-carbon" aria-label="Carbon Credits" title="Carbon Credits">
+    <span class="ic m" id="ic-carbon"></span>
+    <span class="ri-label">Carbon Credits</span>
+  </button><div class="rail-sep"></div><button class="ri" onclick="nav('admin')" id="ri-admin" aria-label="Admin Console" title="Admin Console">
+    <span class="ic m" id="ic-admin"></span>
+    <span class="ri-label">Admin Console</span>
+  </button><button class="ri" onclick="nav('farmer')" id="ri-farmer" aria-label="Farmer / Vet Portal" title="Farmer / Vet Portal">
+    <span class="ic m" id="ic-farmer"></span>
+    <span class="ri-label">Farmer / Vet</span>
+  </button><div class="rail-foot">
+    <div class="rail-status-row">
+      <span class="dot g pulse"></span>
+      <span class="rail-status-label">System Online</span>
+    </div>
+    <div class="rail-status-row" style="margin-top:.25rem">
+      <span class="dot r"></span>
+      <span class="rail-status-label" style="color:var(--red2)">3 Critical</span>
+    </div>
+  </div>
+</nav><!-- ════════════════════════════════════════════
+     MAIN CANVAS
+     ════════════════════════════════════════════ --><main class="canvas" role="main"><!-- COMMAND BAR --><header class="cmdbar" role="banner">
+    <!-- Mobile hamburger — hidden on desktop -->
+    <button class="mobile-menu-btn" onclick="toggleRail()" aria-label="Open menu">
+      <span class="ic m" id="ic-menu"></span>
+    </button>
+
+<!-- PLACEHOLDER: Update ORG_NAME in CONFIG object in JS -->
+<div class="cb-brand">
+  <div class="cb-name">SAIS &middot; <span style="color:var(--gold)">GADA DZ</span></div>
+  <div class="cb-sub">Sentinel Agricultural Intelligence System</div>
+</div>
+
+<!-- Live KPIs — populated from JS DATA ENGINE -->
+<div class="cb-kpi">
+  <div>
+    <div class="cb-kpi-v g" id="kpi-animals">247,340</div>
+    <div class="cb-kpi-l">Animals<br/>National</div>
+  </div>
+</div>
+<div class="cb-kpi">
+  <div>
+    <div class="cb-kpi-v o" id="kpi-health">94.2</div>
+    <div class="cb-kpi-l">Health<br/>Index</div>
+  </div>
+</div>
+<div class="cb-kpi">
+  <div>
+    <div class="cb-kpi-v r" id="kpi-critical">3</div>
+    <div class="cb-kpi-l">Critical<br/>Alerts</div>
+  </div>
+</div>
+<div class="cb-kpi">
+  <div>
+    <div class="cb-kpi-v o" id="kpi-eid">—</div>
+    <div class="cb-kpi-l">Days to<br/>Eid</div>
+  </div>
+</div>
+
+<div class="cb-gap"></div>
+
+<!-- Search -->
+<div class="cb-search">
+  <span class="cb-search-ic ic s" id="ic-search"></span>
+  <input type="text" id="gsearch" placeholder="Search farms, animals, wilayas..." autocomplete="off" aria-label="Global search"/>
+  <div class="search-drop" id="sdrop" role="listbox"></div>
+</div>
+
+<!-- Controls -->
+<button class="cb-btn active essential" id="btn-en" onclick="setLang('en')" aria-label="English">EN</button>
+<button class="cb-btn" id="btn-fr" onclick="setLang('fr')" aria-label="French">FR</button>
+<button class="cb-btn" id="btn-ar" onclick="setLang('ar')" aria-label="Arabic">AR</button>
+
+<select class="cb-role" id="roleSelect" onchange="setRole(this.value)" aria-label="User role">
+  <option value="admin">Admin</option>
+  <option value="minister" selected>Minister</option>
+  <option value="analyst">Analyst</option>
+  <option value="branch">Branch Mgr</option>
+  <option value="farmer">Farmer / Vet</option>
+</select>
+
+<button class="cb-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle theme">
+  <span class="ic s" id="ic-theme"></span>
+  <span id="theme-label">Dark</span>
+</button>
+
+<!-- Live clock -->
+<div class="clock" id="clock" aria-live="polite">—</div>
+
+
+</header><!-- TICKER (Financial + Weather strip) --><div class="ticker" id="ticker-wrap" aria-label="Live market data">
+    <div class="ticker-inner" id="ticker-inner"></div>
+  </div><!-- VIEW AREA --><div class="varea" id="varea">
+
+<!-- ══════ MAP VIEW ══════ -->
+<div class="view active" id="view-map">
+  <div id="map" style="flex:1" aria-label="Algeria national agricultural map"></div>
+
+  <!-- National stats overlay (floating top-left) -->
+  <div class="map-stats" id="map-stats" role="complementary" aria-label="National statistics">
+    <div class="mst">Algeria · National</div>
+    <div class="msr"><span class="msk">Farms Active</span><span class="msv">412</span></div>
+    <div class="msr"><span class="msk">Total Animals</span><span class="msv o">247,340</span></div>
+    <div class="msr"><span class="msk">Health Index</span><span class="msv o">94.2 / 100</span></div>
+    <div class="msr"><span class="msk">Critical Alerts</span><span class="msv r">3</span></div>
+    <div class="msr"><span class="msk">Disease Clusters</span><span class="msv a">2 Active</span></div>
+    <div class="msr"><span class="msk">Blockchain</span><span class="msv g">Verified</span></div>
+    <div class="msr"><span class="msk">Weather — Algiers</span><span class="msv" id="map-weather-val">Loading...</span></div>
+  </div>
+
+  <!-- Weather badge (center top) -->
+  <div class="map-weather" id="map-weather-badge">
+    <span class="ic s" id="ic-cloud"></span>
+    <span id="weather-text">Fetching weather...</span>
+  </div>
+
+  <!-- Map layer controls (top right) -->
+  <div class="map-ctrls" role="group" aria-label="Map controls">
+    <button class="mc-btn active" id="mc-dark" onclick="setTile('dark',this)" aria-pressed="true">
+      <span class="ic s" id="ic-layers"></span> Dark
+    </button>
+    <button class="mc-btn" id="mc-satellite" onclick="setTile('satellite',this)" aria-pressed="false">
+      <span class="ic s" id="ic-globe"></span> Satellite
+    </button>
+    <button class="mc-btn" id="mc-terrain" onclick="setTile('terrain',this)" aria-pressed="false">
+      <span class="ic s" id="ic-mountain"></span> Terrain
+    </button>
+    <button class="mc-btn active" id="mc-farms" onclick="toggleLayer('farms',this)" aria-pressed="true">
+      <span class="ic s" id="ic-home"></span> Farms
+    </button>
+    <button class="mc-btn" id="mc-disease" onclick="toggleLayer('disease',this)" aria-pressed="false">
+      <span class="ic s" id="ic-alert-circle"></span> Disease Risk
+    </button>
+    <button class="mc-btn" id="mc-wilayas" onclick="toggleLayer('wilayas',this)" aria-pressed="false">
+      <span class="ic s" id="ic-map2"></span> Wilayas
+    </button>
+    <button class="mc-btn" onclick="openCam()" aria-label="Live camera feed">
+      <span class="ic s" id="ic-video"></span> Live Camera
+    </button>
+    <button class="mc-btn" onclick="openDrawer('national')" aria-label="National statistics">
+      <span class="ic s" id="ic-info"></span> Stats Panel
+    </button>
+  </div>
+
+  <!-- Time travel slider -->
+  <div class="tsbar" role="group" aria-label="Time travel controls">
+    <span class="ts-lbl">Time Travel</span>
+    <button class="ts-play" id="ts-play" onclick="tsTogglePlay()" aria-label="Play time lapse">
+      <span class="ic s" id="ic-play"></span>
+    </button>
+    <input type="range" id="tsRange" min="0" max="365" value="365" aria-label="Time slider" oninput="tsSlide(this)"/>
+    <div class="ts-date" id="ts-date" aria-live="polite">Mar 12, 2026</div>
+    <button class="ts-reset" onclick="tsReset()" aria-label="Return to today">Today</button>
+  </div>
+</div>
+
+<!-- ══════ HERD VIEW ══════ -->
+<div class="view" id="view-herd">
+  <div class="vh">
+    <span class="ic m gold" id="ic-herd-vh"></span>
+    <div>
+      <div class="vh-title">Herd Intelligence</div>
+      <div class="vh-sub">National Animal Registry · NAID Blockchain Verified · 247,340 Animals</div>
+    </div>
+    <span class="vh-pill crit" id="herd-crit-pill">3 Critical</span>
+    <span class="vh-pill warn" id="herd-warn-pill">12 Monitoring</span>
+    <div class="vh-actions">
+      <button class="btn btn-s" onclick="genPDF()">
+        <span class="ic s" id="ic-download"></span> Export
+      </button>
+      <button class="btn btn-p" onclick="toast('Registration module — Phase 2','gold')">+ Register Animal</button>
+    </div>
+  </div>
+  <div class="vc">
+    <!-- Metric strip populated by JS -->
+    <div class="ms" id="herd-ms">
+      <div class="ms-c"><div class="ms-l">Total Animals</div><div class="ms-v g">247,340</div><div class="ms-d">+1,240 this month</div></div>
+      <div class="ms-c"><div class="ms-l">Avg Health Score</div><div class="ms-v o" id="hms-avg">88.4</div><div class="ms-d">Individual baselines</div></div>
+      <div class="ms-c"><div class="ms-l">Under Monitoring</div><div class="ms-v a">1,234</div><div class="ms-d">+47 last 24h</div></div>
+      <div class="ms-c"><div class="ms-l">Critical Alerts</div><div class="ms-v r">3</div><div class="ms-d">Vet dispatch required</div></div>
+      <div class="ms-c"><div class="ms-l">National Avg BVS</div><div class="ms-v o">82.1</div><div class="ms-d">+3.4 vs last year</div></div>
+    </div>
+    <!-- 72h AI prediction strip -->
+    <div class="pred-box" style="margin-bottom:.85rem">
+      <div class="pred-title">72h National Disease Forecast · LSTM Multi-Sensor Fusion</div>
+      <div style="display:flex;align-items:baseline;gap:.55rem;margin-bottom:.28rem">
+        <div class="pred-pct">87%</div>
+        <div style="font-size:.7rem;color:var(--t3)">Respiratory cluster risk · Wilayas 19 &amp; 25 · 3 farms</div>
+      </div>
+      <div class="pred-body">
+        3 animals show early BRD signatures: resting temp +1.2°C above individual baselines, rumination −18 min/day,
+        acoustic cough pattern 94% confidence.
+        <strong style="color:var(--gold2)">Recommended: Isolation + veterinary visit within 24h.</strong>
+      </div>
+    </div>
+    <!-- Animal table (populated by renderAnimals()) -->
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>NAID</th><th>Species / Breed</th><th>Farm</th>
+          <th>Health</th><th>BVS</th><th>Status</th><th>Last Alert</th>
+        </tr></thead>
+        <tbody id="animal-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ HEALTH VIEW ══════ -->
+<div class="view" id="view-health">
+  <div class="vh">
+    <span class="ic m gold" id="ic-health-vh"></span>
+    <div>
+      <div class="vh-title">Health Surveillance</div>
+      <div class="vh-sub">Epizootic Early Warning · First AI System in Africa · Forensic Tracing</div>
+    </div>
+    <div class="vh-actions">
+      <button class="btn btn-d" onclick="toast('Quarantine protocol initiated — Ministry notification sent','red')">Quarantine Protocol</button>
+      <button class="btn btn-p" onclick="genPDF()">Ministry Report</button>
+    </div>
+  </div>
+  <div class="vc">
+    <div class="ms">
+      <div class="ms-c"><div class="ms-l">Active Clusters</div><div class="ms-v r">2</div><div class="ms-d">Wilaya 16, 25</div></div>
+      <div class="ms-c"><div class="ms-l">Under Monitoring</div><div class="ms-v a">1,234</div><div class="ms-d">+47 last 24h</div></div>
+      <div class="ms-c"><div class="ms-l">72h Forecast</div><div class="ms-v o">+3</div><div class="ms-d">Clusters · 87% conf</div></div>
+      <div class="ms-c"><div class="ms-l">AI Accuracy</div><div class="ms-v g">94%</div><div class="ms-d">30-day validation</div></div>
+    </div>
+    <div class="cg cg2" style="height:168px">
+      <div class="cc">
+        <div class="cc-t">Disease Clusters — 30 Days</div>
+        <div class="cc-s">Active clusters nationally</div>
+        <div class="cc-w" style="height:120px"><canvas id="health-chart"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="cc-t">Risk Score by Wilaya</div>
+        <div class="cc-s">Top 8 at-risk regions</div>
+        <div class="cc-w" style="height:120px"><canvas id="wilaya-chart"></canvas></div>
+      </div>
+    </div>
+    <div style="font-family:var(--ff-m);font-size:.52rem;color:var(--t3);text-transform:uppercase;letter-spacing:.13em;margin-bottom:.38rem">Live Alert Feed · Priority Queue</div>
+    <div class="al-list" id="alert-list"></div>
+  </div>
+</div>
+
+<!-- ══════ FINANCIAL VIEW ══════ -->
+<div class="view" id="view-financial">
+  <div class="vh">
+    <span class="ic m gold" id="ic-financial-vh"></span>
+    <div>
+      <div class="vh-title">Financial Command</div>
+      <div class="vh-sub">Bloomberg of the Sahara · Trade Intelligence · Anomaly Detection</div>
+    </div>
+    <div class="vh-actions">
+      <button class="btn btn-s">Export CSV</button>
+      <button class="btn btn-p" onclick="genPDF()">Cabinet Brief</button>
+    </div>
+  </div>
+  <div class="vc">
+    <!-- Eid Al Adha intelligence card -->
+    <div class="eid-card">
+      <div class="eid-lbl">Eid Al Adha · National Supply Intelligence · AI Forecast ±3%</div>
+      <div class="eid-days" id="eid-countdown">— days</div>
+      <div class="eid-sub">
+        <strong style="color:var(--gold2)">Action required:</strong>
+        Initiate import tender within 7 days. 53,000 sheep deficit projected.
+        Current supply: 1,247,000 · Demand: 1,300,000 · Gap: 53,000 heads.
+      </div>
+      <div class="eid-stats">
+        <div class="eid-s"><div class="eid-sv">1,247,000</div><div class="eid-sl">Supply</div></div>
+        <div class="eid-s"><div class="eid-sv" style="color:var(--red2)">−53,000</div><div class="eid-sl">Deficit</div></div>
+        <div class="eid-s"><div class="eid-sv">$19.2M</div><div class="eid-sl">Import Value</div></div>
+      </div>
+    </div>
+    <div class="cg cg2" style="height:168px;margin-bottom:.85rem">
+      <div class="cc">
+        <div class="cc-t">Livestock Price Index — 30 Days</div>
+        <div class="cc-s">DZD/kg lamb · Algerian national avg</div>
+        <div class="cc-w" style="height:120px"><canvas id="price-chart"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="cc-t">Export Volume by Destination</div>
+        <div class="cc-s">Live sheep exports · monthly 2026</div>
+        <div class="cc-w" style="height:120px"><canvas id="export-chart"></canvas></div>
+      </div>
+    </div>
+    <div style="font-family:var(--ff-m);font-size:.52rem;color:var(--t3);text-transform:uppercase;letter-spacing:.13em;margin-bottom:.38rem">Anomalous Transactions · AI Fraud Detection</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Tx ID</th><th>Farm / Vendor</th><th>Amount (DZD)</th><th>Category</th><th>Anomaly Score</th><th>AI Explanation</th><th></th>
+        </tr></thead>
+        <tbody id="fraud-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ POULTRY VIEW ══════ -->
+<div class="view" id="view-poultry">
+  <div class="vh">
+    <span class="ic m gold" id="ic-poultry-vh"></span>
+    <div><div class="vh-title">Poultry Network</div><div class="vh-sub">Environmental AI · Acoustic Health Index · NH₃ / CO₂ / Thermal Monitoring</div></div>
+    <div class="vh-actions"><button class="btn btn-p" onclick="toast('Building registration — contact GADA support','gold')">+ Add Building</button></div>
+  </div>
+  <div class="vc">
+    <div class="ms" style="margin-bottom:.85rem">
+      <div class="ms-c"><div class="ms-l">Buildings Monitored</div><div class="ms-v">48</div></div>
+      <div class="ms-c"><div class="ms-l">Avg Acoustic Index</div><div class="ms-v o">88</div></div>
+      <div class="ms-c"><div class="ms-l">NH₃ Alerts</div><div class="ms-v a">2</div></div>
+      <div class="ms-c"><div class="ms-l">Avian Flu Risk</div><div class="ms-v g">LOW</div><div class="ms-d">AI confirmed</div></div>
+    </div>
+    <div class="pg" id="poultry-grid"></div>
+  </div>
+</div>
+
+<!-- ══════ GENETIC VIEW ══════ -->
+<div class="view" id="view-genetic">
+  <div class="vh">
+    <span class="ic m gold" id="ic-genetic-vh"></span>
+    <div><div class="vh-title">Genetic AI — Breeding Optimization</div><div class="vh-sub">BVS · Graph Neural Network · 10-Year National Projection · Ouled Djellal Program</div></div>
+    <div class="vh-actions"><button class="btn btn-p" onclick="toast('National optimization queued — 14,230 pair candidates analyzed','gold')">Run National Optimization</button></div>
+  </div>
+  <div class="vc">
+    <div class="ms" style="margin-bottom:.85rem">
+      <div class="ms-c"><div class="ms-l">National Avg BVS</div><div class="ms-v o">82.1</div><div class="ms-d">+3.4 vs last year</div></div>
+      <div class="ms-c"><div class="ms-l">Disease Resistance Gain</div><div class="ms-v g">+18%</div><div class="ms-d">3-year GNN program</div></div>
+      <div class="ms-c"><div class="ms-l">Top National BVS</div><div class="ms-v o">97.2</div><div class="ms-d">DZ-30-OVI-2021</div></div>
+      <div class="ms-c"><div class="ms-l">Optimized Pairs</div><div class="ms-v">14,230</div><div class="ms-d">This breeding season</div></div>
+    </div>
+    <!-- Breeding simulator — data driven from ANIMALS array -->
+    <div class="breed-box">
+      <div class="breed-head">Breeding Outcome Simulator · GNN Prediction Engine · Weighted Average BVS + Genetic Heterosis</div>
+      <div class="breed-inner">
+        <div class="bc">
+          <div class="bc-lbl">Female</div>
+          <div class="bc-naid">DZ-48-OVI-2026-000234</div>
+          <div class="bc-name">Ouled Djellal</div>
+          <div class="bc-bvs">87.4</div><div class="bc-bvs-l">BVS Score</div>
+          <div class="bc-dims">
+            <div class="bd"><div class="bd-l">ADG</div><div class="bd-v">85</div></div>
+            <div class="bd"><div class="bd-l">Disease</div><div class="bd-v">88</div></div>
+            <div class="bd"><div class="bd-l">FCR</div><div class="bd-v">86</div></div>
+            <div class="bd"><div class="bd-l">Repro</div><div class="bd-v">91</div></div>
+          </div>
+        </div>
+        <div class="bc-arr">×</div>
+        <div class="bc">
+          <div class="bc-lbl">Male · National #1</div>
+          <div class="bc-naid">DZ-30-OVI-2021-004782</div>
+          <div class="bc-name">Ouled Djellal</div>
+          <div class="bc-bvs">97.2</div><div class="bc-bvs-l">BVS Score</div>
+          <div class="bc-dims">
+            <div class="bd"><div class="bd-l">ADG</div><div class="bd-v">98</div></div>
+            <div class="bd"><div class="bd-l">Disease</div><div class="bd-v">96</div></div>
+            <div class="bd"><div class="bd-l">FCR</div><div class="bd-v">95</div></div>
+            <div class="bd"><div class="bd-l">Repro</div><div class="bd-v">99</div></div>
+          </div>
+        </div>
+        <div class="bc-arr" style="color:var(--gold2);font-size:.9rem">→</div>
+        <div class="bc offspring">
+          <div class="bc-lbl">Predicted Offspring · GNN</div>
+          <!-- Formula: (87.4 + 97.2)/2 × 1.058 heterosis = ~92.3 → rounded to 93.1 with CI ±2.4 -->
+          <div class="bc-bvs" style="font-size:2.1rem;margin-top:.35rem">93.1</div>
+          <div class="bc-bvs-l">BVS ± 2.4 · 91st percentile</div>
+          <div class="bc-dims" style="margin-top:.65rem">
+            <div class="bd"><div class="bd-l">ADG</div><div class="bd-v" style="color:var(--gold2)">94</div></div>
+            <div class="bd"><div class="bd-l">Disease</div><div class="bd-v" style="color:var(--green2)">91</div></div>
+            <div class="bd"><div class="bd-l">FCR</div><div class="bd-v" style="color:var(--gold2)">89</div></div>
+            <div class="bd"><div class="bd-l">Longevity</div><div class="bd-v" style="color:var(--green2)">95</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cg cg2" style="height:178px">
+      <div class="cc">
+        <div class="cc-t">10-Year National BVS Projection</div>
+        <div class="cc-s">National avg BVS trend · GNN model</div>
+        <div class="cc-w" style="height:130px"><canvas id="genetic-chart"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="cc-t">BVS Distribution — National Herd</div>
+        <div class="cc-s">247,340 animals by score range</div>
+        <div class="cc-w" style="height:130px"><canvas id="bvs-chart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ LEGAL VIEW ══════ -->
+<div class="view" id="view-legal">
+  <div class="vh">
+    <span class="ic m gold" id="ic-legal-vh"></span>
+    <div><div class="vh-title">Legal &amp; Policy Intelligence</div><div class="vh-sub">Journal Officiel · 1962–2026 · 3,847 Laws · AI-Powered Analysis</div></div>
+    <div class="vh-actions"><button class="btn btn-p" onclick="genPDF()">Generate Cabinet Briefing</button></div>
+  </div>
+  <div class="vc np">
+    <div class="lsplit">
+      <div class="ltree" id="legal-tree" role="tree" aria-label="Legal archive"></div>
+      <div class="lcontent" id="legal-content">
+        <div class="lai-box">
+          <div class="lai-l">SAIS AI · Legal Intelligence Engine</div>
+          <div style="font-size:.78rem;color:var(--t2);line-height:1.7">
+            Select any law from the archive to view text and AI analysis.
+            System has indexed <strong>3,847 laws and decrees</strong> since 1962.
+            Ask the AI assistant any legal question in natural language — French, Arabic, or English.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SECURITY VIEW ══════ -->
+<div class="view" id="view-security">
+  <div class="vh">
+    <span class="ic m gold" id="ic-security-vh"></span>
+    <div><div class="vh-title">Security Posture</div><div class="vh-sub">Zero-Trust · 6 Network Zones · HotStuff BFT · AI Immune System</div></div>
+    <div class="vh-actions">
+      <button class="btn btn-d" onclick="toast('Lockdown protocol requires 2FA confirmation — see Security Console','red')">Initiate Lockdown</button>
+      <button class="btn btn-s" onclick="genPDF()">Security Report</button>
+    </div>
+  </div>
+  <div class="vc">
+    <div class="ms" style="margin-bottom:.85rem">
+      <div class="ms-c"><div class="ms-l">Zero-Trust Score</div><div class="ms-v g">98.4%</div></div>
+      <div class="ms-c"><div class="ms-l">Threats Blocked Today</div><div class="ms-v o">847</div><div class="ms-d">SOAR automated</div></div>
+      <div class="ms-c"><div class="ms-l">Under Investigation</div><div class="ms-v a">2</div></div>
+      <div class="ms-c"><div class="ms-l">Encryption Coverage</div><div class="ms-v g">100%</div><div class="ms-d">AES-256-GCM</div></div>
+    </div>
+    <div class="cg cg2" style="height:196px;margin-bottom:.85rem">
+      <div class="cc">
+        <div class="cc-t">Security Score by Zone</div>
+        <div class="cc-s">6 network segments · 0–100</div>
+        <div class="cc-w" style="height:148px"><canvas id="sec-chart"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="cc-t">Active Threats</div>
+        <div class="cc-s">Real-time incident log</div>
+        <div id="threat-list"></div>
+      </div>
+    </div>
+    <div style="font-family:var(--ff-m);font-size:.52rem;color:var(--t3);text-transform:uppercase;letter-spacing:.13em;margin-bottom:.35rem">Live Security Event Stream</div>
+    <div class="slog" id="sec-log"></div>
+  </div>
+</div>
+
+<!-- ══════ BLOCKCHAIN VIEW ══════ -->
+<div class="view" id="view-blockchain">
+  <div class="vh">
+    <span class="ic m gold" id="ic-blockchain-vh"></span>
+    <div><div class="vh-title">Blockchain Ledger</div><div class="vh-sub">Hyperledger Fabric · HotStuff BFT · GADA + 3 Ministry Nodes · Merkle Mountain Range</div></div>
+  </div>
+  <div class="vc">
+    <div class="ms" style="margin-bottom:.85rem">
+      <div class="ms-c"><div class="ms-l">Total Blocks</div><div class="ms-v o">48,237</div></div>
+      <div class="ms-c"><div class="ms-l">Transactions</div><div class="ms-v g">1,241,892</div></div>
+      <div class="ms-c"><div class="ms-l">Consensus Nodes</div><div class="ms-v">4 / 4</div><div class="ms-d">GADA + 3 Ministries</div></div>
+      <div class="ms-c"><div class="ms-l">Chain Integrity</div><div class="ms-v g">Verified</div><div class="ms-d">BFT consensus</div></div>
+    </div>
+    <div class="verify-strip">
+      <div style="font-family:var(--ff-h);font-size:.8rem;font-weight:700;margin-bottom:.18rem">Animal Identity Verification · Merkle Proof</div>
+      <div style="font-size:.7rem;color:var(--t3)">Enter NAID to verify authenticity via cryptographic Merkle proof</div>
+      <input class="vi" id="verify-input" placeholder="e.g. DZ-48-OVI-2026-000234" value="DZ-48-OVI-2026-000234" aria-label="NAID to verify"/>
+      <button class="btn btn-p" onclick="verifyChain()">Verify Merkle Proof</button>
+      <div class="vr" id="verify-result">
+        <span style="color:var(--green2)">VERIFIED</span> · DZ-48-OVI-2026-000234<br/>
+        Block #48,195 · Hash: a3f8b2c1d4e5f678… · Node: GADA-PRIMARY-RELIZANE<br/>
+        Birth: Ferme Pilote Relizane · 2026-02-14 · Ouled Djellal female ·
+        <span style="color:var(--green2)">All properties verified — no tampering detected</span>
+      </div>
+    </div>
+    <div style="font-family:var(--ff-m);font-size:.52rem;color:var(--t3);text-transform:uppercase;letter-spacing:.13em;margin-bottom:.35rem">Latest Blocks</div>
+    <div style="border:1px solid var(--b1);border-radius:var(--r);overflow:hidden" id="block-list"></div>
+  </div>
+</div>
+
+<!-- ══════ CARBON VIEW ══════ -->
+<div class="view" id="view-carbon">
+  <div class="vh">
+    <span class="ic m gold" id="ic-carbon-vh"></span>
+    <div><div class="vh-title">Carbon Credits</div><div class="vh-sub">CH₄ Sensor Intelligence · Gold Standard · Verra VCS · 47 Active Farms</div></div>
+    <div class="vh-actions">
+      <button class="btn btn-p" onclick="toast('Certificate generated — Gold Standard VCS#2026-DZ-0847','green')">Generate Certificate</button>
+    </div>
+  </div>
+  <div class="vc">
+    <div class="ms" style="margin-bottom:.85rem">
+      <div class="ms-c"><div class="ms-l">Credits Generated YTD</div><div class="ms-v g">12,400 t</div><div class="ms-d">CO₂e verified</div></div>
+      <div class="ms-c"><div class="ms-l">Revenue YTD</div><div class="ms-v o">€1.02M</div><div class="ms-d">@€82.5/t avg EU ETS</div></div>
+      <div class="ms-c"><div class="ms-l">Active Projects</div><div class="ms-v">47 farms</div></div>
+      <div class="ms-c"><div class="ms-l">Avg CH₄ Reduction</div><div class="ms-v g">−23%</div></div>
+    </div>
+    <div class="cg cg2" style="height:200px">
+      <div class="cc">
+        <div class="cc-t">Monthly Credits — Tons CO₂e</div>
+        <div class="cc-s">2026 year-to-date</div>
+        <div class="cc-w" style="height:152px"><canvas id="carbon-chart"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="cc-t">Revenue Projection</div>
+        <div class="cc-s">12-month at €82.5/t EU ETS rate</div>
+        <div class="cc-w" style="height:152px"><canvas id="carbon-rev-chart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ ADMIN VIEW ══════ -->
+<div class="view" id="view-admin">
+  <div class="vh">
+    <span class="ic m gold" id="ic-admin-vh"></span>
+    <div><div class="vh-title">Admin Console</div><div class="vh-sub">Full System Access · Debugging · Feature Flags · Infrastructure Metrics</div></div>
+    <div class="vh-actions">
+      <button class="btn btn-d" onclick="toast('Emergency stop requires dual-admin authorization','red')">Emergency Stop</button>
+    </div>
+  </div>
+  <div class="vc">
+    <div class="ag">
+      <div class="ac">
+        <div style="font-family:var(--ff-h);font-size:.78rem;font-weight:700;margin-bottom:.55rem;color:var(--t1)">Infrastructure Metrics</div>
+        <!-- PLACEHOLDER: Connect to real monitoring API (Prometheus/Grafana) -->
+        <div class="am"><span>CPU (AI Brain · Ryzen 9 7950X3D)</span><span class="amv" id="cpu-val">34%</span></div>
+        <div class="am"><span>RAM</span><span class="amv">68% / 256 GB</span></div>
+        <div class="am"><span>GPU (RTX 5090 Inference)</span><span class="amv" id="gpu-val">52%</span></div>
+        <div class="am"><span>Kafka Throughput</span><span class="amv">2.4M msg/s</span></div>
+        <div class="am"><span>TimescaleDB</span><span class="amv">4.7 TB / 12 TB</span></div>
+        <div class="am"><span>Neo4j Nodes</span><span class="amv">847M</span></div>
+        <div class="am"><span>Blockchain Nodes</span><span class="amv" style="color:var(--green2)">4/4 Online</span></div>
+        <div class="am"><span>Air-Gap Backup (Relizane)</span><span class="amv" style="color:var(--green2)">03:00 Today ✓</span></div>
+      </div>
+      <div class="ac">
+        <div style="font-family:var(--ff-h);font-size:.78rem;font-weight:700;margin-bottom:.55rem;color:var(--t1)">Feature Flags</div>
+        <div class="am"><span>DeepSeek-14B Local (Sovereign AI)</span><span class="amv" style="color:var(--green2)">LIVE</span></div>
+        <div class="am"><span>Drone Autonomy Module</span><span class="amv" style="color:var(--amber)">BETA</span></div>
+        <div class="am"><span>ZK-SNARK Privacy Layer</span><span class="amv" style="color:var(--green2)">ACTIVE</span></div>
+        <div class="am"><span>Federated Learning (SMPC)</span><span class="amv" style="color:var(--green2)">ACTIVE</span></div>
+        <div class="am"><span>Speculative Execution Engine</span><span class="amv" style="color:var(--green2)">ACTIVE</span></div>
+        <div class="am"><span>Darja Voice AI</span><span class="amv" style="color:var(--amber)">PHASE 2</span></div>
+        <div class="am"><span>GADA-SAT (Sentinel-2 Integration)</span><span class="amv" style="color:var(--amber)">PENDING</span></div>
+        <div class="am"><span>Post-Quantum Crypto (CRYSTALS)</span><span class="amv" style="color:var(--t3)">PHASE 3</span></div>
+      </div>
+    </div>
+    <div style="font-family:var(--ff-m);font-size:.52rem;color:var(--t3);text-transform:uppercase;letter-spacing:.13em;margin-bottom:.32rem">Live System Log</div>
+    <div class="debug" id="admin-log"></div>
+  </div>
+</div>
+
+<!-- ══════ FARMER VIEW ══════ -->
+<div class="view" id="view-farmer">
+  <div class="vh">
+    <span class="ic m gold" id="ic-farmer-vh"></span>
+    <div><div class="vh-title">Farmer / Veterinarian Portal</div><div class="vh-sub">Mobile-First · WhatsApp Bot Integration · Darja Voice (Phase 2)</div></div>
+  </div>
+  <div class="vc">
+    <div class="farm-wrap">
+      <div class="ms" style="margin-bottom:.85rem">
+        <div class="ms-c"><div class="ms-l">My Farm</div><div class="ms-v o" style="font-size:1rem">Ferme Pilote</div><div class="ms-d">FARM-048-001 · Relizane</div></div>
+        <div class="ms-c"><div class="ms-l">Animals</div><div class="ms-v">1,240</div><div class="ms-d">Ahmed Benali</div></div>
+      </div>
+      <div style="font-family:var(--ff-m);font-size:.52rem;color:var(--t3);text-transform:uppercase;letter-spacing:.13em;margin-bottom:.35rem">Today's Tasks · Mar 12, 2026</div>
+      <div style="border:1px solid var(--b1);border-radius:var(--r);overflow:hidden;margin-bottom:.75rem">
+        <div class="task-row"><span class="ic m" id="ic-task1"></span><div class="task-text">Vaccinate 23 lambs (Lot #7) — FMD booster overdue</div><span class="tag ta">Due Today</span></div>
+        <div class="task-row"><span class="ic m red" id="ic-task2"></span><div class="task-text">Check DZ-48-OVI-2026-000235 — 87% BRD risk detected by AI</div><span class="tag tr">URGENT</span></div>
+        <div class="task-row"><span class="ic m" id="ic-task3"></span><div class="task-text">Weekly body condition photo scan — Paddock B</div><span class="tag to">Scheduled</span></div>
+        <div class="task-row"><span class="ic m" id="ic-task4"></span><div class="task-text">Water trough temp check — 42°C heat alert active today</div><span class="tag ta">Heat Alert</span></div>
+      </div>
+      <button class="voice-btn" onclick="toast('Darja Voice AI — Phase 2: Custom Algerian ASR training in progress. Target: 85%+ accuracy for agri vocabulary.','gold')" aria-label="Darja voice AI">
+        <span class="ic m" id="ic-mic"></span>
+        تكلم بالدارجة — Speak Darja (Phase 2)
+      </button>
+    </div>
+  </div>
+</div>
+
+
+</div><!-- /varea -->
+</main><!-- ════════════════════════════════════════════
+     RIGHT DRAWER (Entity details + AI Chat)
+     ════════════════════════════════════════════ --><aside class="drawer" id="drawer" role="complementary" aria-label="Entity details and AI chat">
+  <div class="dr-head">
+    <div class="dr-title" id="dr-title">National Overview</div>
+    <button class="dr-close" onclick="closeDrawer()" aria-label="Close panel">
+      <span class="ic m" id="ic-x"></span>
+    </button>
+  </div>
+  <div class="dr-body" id="dr-body"></div><!-- AI Chat — always visible at bottom of drawer --><div class="chat">
+    <div class="chat-head">
+      <div class="chat-av">SA</div>
+      <div>
+        <div class="chat-name">SAIS Intelligence</div>
+        <div class="chat-online">Sovereign AI · Online</div>
+      </div>
+    </div>
+    <!-- Quick prompts -->
+    <div class="chat-qp" id="chat-qp">
+      <span class="qp" onclick="askAI('Status of Wilaya 48 — health, farms, animals, forecast?')">Wilaya 48</span>
+      <span class="qp" onclick="askAI('Summarize the 3 most urgent alerts and required actions.')">Urgent Alerts</span>
+      <span class="qp" onclick="askAI('Eid Al Adha supply analysis and import tender recommendation.')">Eid Forecast</span>
+      <span class="qp" onclick="askAI('Prepare a cabinet briefing summary for tomorrow morning.')">Cabinet Brief</span>
+    </div>
+    <div class="chat-msgs" id="chat-msgs" role="log" aria-label="AI conversation"></div>
+    <div class="chat-in">
+      <textarea class="chat-input" id="chat-input" rows="1" placeholder="Ask SAIS anything…" aria-label="Chat message" onkeydown="chatKey(event)"></textarea>
+      <button class="chat-send" onclick="submitChat()" aria-label="Send message">
+        <span class="ic s" id="ic-send" style="color:var(--bg0)"></span>
+      </button>
+    </div>
+  </div>
+</aside><!-- ════════════════════════════════════════════
+     CAMERA MODAL
+     ════════════════════════════════════════════ --><div class="modal-bg" id="cam-modal" role="dialog" aria-modal="true" aria-label="Live farm camera">
+  <div class="modal">
+    <div class="modal-h">
+      <div class="modal-title">Live Camera · Ferme Pilote Relizane · CAM-01</div>
+      <div style="display:flex;align-items:center;gap:.6rem">
+        <div class="live-badge"><div class="live-dot"></div>LIVE · 4K · YOLOv10</div>
+        <button class="modal-close" onclick="closeModal('cam-modal')" aria-label="Close">✕</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="cam-frame" aria-label="Farm camera feed">
+        <div style="font-size:2.8rem;opacity:.15;color:var(--t1)">▶</div>
+        <div class="cam-scan"></div>
+        <div class="cam-corner tl"></div><div class="cam-corner tr"></div>
+        <div class="cam-corner bl"></div><div class="cam-corner br"></div>
+        <div class="cam-lbl" id="cam-ts">CAM-01 · 14:32:18 · THERMAL ON</div>
+        <div style="position:absolute;top:.4rem;right:.5rem;font-family:var(--ff-m);font-size:.55rem;background:rgba(0,0,0,.7);padding:.1rem .38rem;border-radius:2px;color:var(--t2)">GADA-CAM-FARM048</div>
+      </div>
+      <div style="font-family:var(--ff-m);font-size:.63rem;color:var(--t3);text-align:center;margin-bottom:.6rem">YOLOv10 Detection: 87 animals · 1 monitoring · 0 critical · Gait analysis active</div>
+      <div class="ms" style="margin-bottom:.6rem">
+        <div class="ms-c"><div class="ms-l">Detected</div><div class="ms-v">87</div></div>
+        <div class="ms-c"><div class="ms-l">Max Thermal</div><div class="ms-v a">39.8°C</div></div>
+        <div class="ms-c"><div class="ms-l">Lameness</div><div class="ms-v g">0 flags</div></div>
+      </div>
+      <div style="display:flex;gap:.38rem">
+        <button class="btn btn-s" style="flex:1" onclick="toast('PTZ control activated','gold')">PTZ Control</button>
+        <button class="btn btn-s" style="flex:1" onclick="toast('Thermal overlay toggled','gold')">Thermal</button>
+        <button class="btn btn-p" style="flex:1" onclick="toast('Drone dispatched — ETA 4 min · DJI Matrice 350 RTK','gold');closeModal('cam-modal')">
+          <span class="ic s" id="ic-drone" style="color:var(--bg0)"></span> Dispatch Drone
+        </button>
+      </div>
+    </div>
+  </div>
+</div><!-- PDF Generation Modal --><div class="modal-bg" id="pdf-modal" role="dialog" aria-modal="true" aria-label="Generating PDF">
+  <div class="modal" style="width:320px">
+    <div class="modal-body" style="text-align:center;padding:1.4rem">
+      <span class="ic xl" id="ic-pdf" style="margin:0 auto .65rem;color:var(--gold)"></span>
+      <div style="font-family:var(--ff-h);font-size:.88rem;font-weight:700;margin-bottom:.28rem">Generating Cabinet Briefing</div>
+      <div style="font-size:.7rem;color:var(--t3);margin-bottom:.75rem">Compiling overnight SAIS data…</div>
+      <div class="pdf-bar"><div class="pdf-fill" id="pdf-fill"></div></div>
+      <div class="pdf-st" id="pdf-st">Initializing…</div>
+    </div>
+  </div>
+</div><!-- TOAST --><div class="toast" id="toast-el" role="status" aria-live="polite"></div></div><!-- /shell --><!-- ════════════════════════════════════════════════════════════
+     JAVASCRIPT — SAIS v3 APPLICATION
+     ════════════════════════════════════════════════════════════ --><script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════════
+   MODULE 00 — CONFIGURATION
+   PLACEHOLDER: Edit all values in this block
+   ════════════════════════════════════════════════════════════ */
+const CONFIG = {
+  // PLACEHOLDER: Organization identity
+  ORG_NAME:     'GADA',
+  ORG_FULL:     'Groupement Algérien de Développement Agricole',
+  SYSTEM_NAME:  'SAIS',
+  VERSION:      '3.0.0',
+
+  // PLACEHOLDER: AI proxy URL — for production use a backend proxy
+  // In production: 'https://your-domain.com/api/ai-chat'
+  // For demo: set to null to use fallback responses
+  AI_PROXY_URL: null,
+
+  // PLACEHOLDER: Add API key only for local demo — NEVER in production
+  // For production, set AI_PROXY_URL and leave this empty
+  AI_KEY: '',
+
+  // PLACEHOLDER: Real-time data refresh interval (ms)
+  REFRESH_MS: 45000,
+
+  // Map defaults — Algeria centroid
+  MAP_CENTER: [28.2, 2.5],
+  MAP_ZOOM:   5,
+
+  // Eid Al Adha 2026 date (recalculate each year)
+  // 2026: ~May 26 (shifts ~11 days earlier each year)
+  EID_DATE: new Date('2026-05-26'),
+
+  // Tile providers (all free)
+  TILES: {
+    dark:      'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    terrain:   'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+  },
+
+  // Open-Meteo weather API (completely free, no key needed)
+  WEATHER_URL: 'https://api.open-meteo.com/v1/forecast?latitude=36.74&longitude=3.04&current_weather=true&wind_speed_unit=kmh',
+};
+
+/* ════════════════════════════════════════════════════════════
+   MODULE 01 — DATA ENGINE
+   All fake data generated from a seeded PRNG.
+   This ensures data is CONSISTENT across every view and reload.
+   Every number is internally coherent and calculated, not random.
+
+   SEEDED PRNG: Park-Miller LCG — produces same sequence for same seed.
+   SEED = 20260311 (GADA operational date: March 11, 2026)
+   ════════════════════════════════════════════════════════════ */
+
+/**
+ * Creates a seeded pseudo-random number generator.
+ * Returns float in [0, 1). Same seed → same sequence always.
+ */
+function mkRNG(seed) {
+  let s = seed >>> 0;
+  return {
+    next() { s = (Math.imul(16807, s) + 0) >>> 0; return (s >>> 0) / 4294967296; },
+    int(a, b) { return Math.floor(this.next() * (b - a + 1)) + a; },
+    pick(arr) { return arr[this.int(0, arr.length - 1)]; },
+    walk(n, start, variance) {
+      const d = [start];
+      for (let i = 1; i < n; i++) d.push(Math.max(0.5, Math.min(99.5, d[i-1] + (this.next()-.5)*2*variance)));
+      return d;
+    }
+  };
+}
+const RNG = mkRNG(20260311);
+
+/* ── ALL 58 WILAYAS — real centroids, real areas ──
+   Source: ONS Algeria, Wikipedia
+   lat/lng are accurate geographic centroids
+*/
+const WILAYAS = [
+  {id:1, name:'Adrar',      lat:27.87, lng:-0.29, pop:432005,  area:427368, agro:'Pastoral'},
+  {id:2, name:'Chlef',      lat:36.16, lng:1.33,  pop:1024000, area:4791,   agro:'Cereals'},
+  {id:3, name:'Laghouat',   lat:33.80, lng:2.87,  pop:570000,  area:25057,  agro:'Pastoral'},
+  {id:4, name:'OEB',        lat:35.88, lng:7.11,  pop:677000,  area:6768,   agro:'Cereals'},
+  {id:5, name:'Batna',      lat:35.56, lng:6.17,  pop:1290000, area:12038,  agro:'Cereals/Livestock'},
+  {id:6, name:'Béjaïa',     lat:36.75, lng:5.07,  pop:1012000, area:3261,   agro:'Olives/Fruit'},
+  {id:7, name:'Biskra',     lat:34.85, lng:5.73,  pop:893000,  area:21671,  agro:'Dates/Pastoral'},
+  {id:8, name:'Béchar',     lat:31.62, lng:-2.22, pop:299000,  area:162200, agro:'Pastoral'},
+  {id:9, name:'Blida',      lat:36.47, lng:2.82,  pop:1100000, area:1696,   agro:'Fruit/Vegetables'},
+  {id:10, name:'Bouira',    lat:36.38, lng:3.90,  pop:728000,  area:4439,   agro:'Cereals/Olives'},
+  {id:11, name:'Tamanrasset',lat:22.79,lng:5.52,  pop:219000,  area:556200, agro:'Pastoral'},
+  {id:12, name:'Tébessa',   lat:35.40, lng:8.13,  pop:701000,  area:14227,  agro:'Cereals/Livestock'},
+  {id:13, name:'Tlemcen',   lat:34.88, lng:-1.32, pop:1013000, area:9061,   agro:'Cereals/Wine'},
+  {id:14, name:'Tiaret',    lat:35.37, lng:1.32,  pop:891000,  area:20673,  agro:'Cereals/Livestock'},
+  {id:15, name:'Tizi Ouzou',lat:36.72, lng:4.05,  pop:1147000, area:2957,   agro:'Olives/Figs'},
+  {id:16, name:'Algiers',   lat:36.74, lng:3.04,  pop:3500000, area:1190,   agro:'Urban'},
+  {id:17, name:'Djelfa',    lat:34.67, lng:3.26,  pop:1351000, area:66415,  agro:'Pastoral/Livestock'},
+  {id:18, name:'Jijel',     lat:36.82, lng:5.77,  pop:661000,  area:2577,   agro:'Olives/Citrus'},
+  {id:19, name:'Sétif',     lat:36.19, lng:5.41,  pop:1689000, area:6504,   agro:'Cereals'},
+  {id:20, name:'Saïda',     lat:34.83, lng:0.15,  pop:333000,  area:6764,   agro:'Cereals/Livestock'},
+  {id:21, name:'Skikda',    lat:36.88, lng:6.91,  pop:957000,  area:4137,   agro:'Citrus/Olives'},
+  {id:22, name:'Sidi B.A.', lat:35.19, lng:-0.63, pop:651000,  area:9150,   agro:'Cereals/Livestock'},
+  {id:23, name:'Annaba',    lat:36.90, lng:7.76,  pop:672000,  area:1439,   agro:'Industrial'},
+  {id:24, name:'Guelma',    lat:36.46, lng:7.44,  pop:514000,  area:3686,   agro:'Cereals/Fruit'},
+  {id:25, name:'Constantine',lat:36.36,lng:6.61,  pop:956000,  area:2187,   agro:'Cereals/Urban'},
+  {id:26, name:'Médéa',     lat:36.27, lng:2.75,  pop:818000,  area:8866,   agro:'Fruit/Cereals'},
+  {id:27, name:'Mostaganem',lat:35.93, lng:0.09,  pop:800000,  area:2269,   agro:'Viticulture/Citrus'},
+  {id:28, name:'M\'Sila',   lat:35.71, lng:4.54,  pop:1082000, area:18175,  agro:'Cereals/Livestock'},
+  {id:29, name:'Mascara',   lat:35.40, lng:0.14,  pop:832000,  area:5941,   agro:'Cereals/Wine'},
+  {id:30, name:'Ouargla',   lat:31.95, lng:5.32,  pop:640000,  area:211980, agro:'Dates/Pastoral'},
+  {id:31, name:'Oran',      lat:35.70, lng:-0.63, pop:1800000, area:2114,   agro:'Urban/Cereals'},
+  {id:32, name:'El Bayadh', lat:33.68, lng:1.02,  pop:250000,  area:71420,  agro:'Pastoral'},
+  {id:33, name:'Illizi',    lat:26.58, lng:8.48,  pop:66000,   area:285000, agro:'Pastoral'},
+  {id:34, name:'BBA',       lat:36.07, lng:4.76,  pop:675000,  area:3975,   agro:'Cereals'},
+  {id:35, name:'Boumerdès', lat:36.77, lng:3.48,  pop:872000,  area:1456,   agro:'Citrus/Urban'},
+  {id:36, name:'El Tarf',   lat:36.77, lng:8.31,  pop:477000,  area:3339,   agro:'Cereals/Livestock'},
+  {id:37, name:'Tindouf',   lat:27.70, lng:-8.10, pop:58000,   area:159000, agro:'Pastoral'},
+  {id:38, name:'Tissemsilt',lat:35.60, lng:1.81,  pop:318000,  area:3152,   agro:'Cereals/Livestock'},
+  {id:39, name:'El Oued',   lat:33.37, lng:6.86,  pop:730000,  area:54573,  agro:'Dates/Pastoral'},
+  {id:40, name:'Khenchela', lat:35.43, lng:7.14,  pop:416000,  area:9811,   agro:'Cereals/Livestock'},
+  {id:41, name:'Souk Ahras',lat:36.29, lng:7.95,  pop:448000,  area:4541,   agro:'Cereals'},
+  {id:42, name:'Tipaza',    lat:36.58, lng:2.45,  pop:626000,  area:2166,   agro:'Fruit/Tourism'},
+  {id:43, name:'Mila',      lat:36.45, lng:6.26,  pop:821000,  area:3477,   agro:'Cereals/Livestock'},
+  {id:44, name:'Aïn Defla', lat:36.26, lng:1.97,  pop:778000,  area:4897,   agro:'Fruit/Vegetables'},
+  {id:45, name:'Naâma',     lat:33.27, lng:-0.31, pop:215000,  area:29825,  agro:'Pastoral'},
+  {id:46, name:'Aïn Témouchent',lat:35.30,lng:-1.14,pop:415000,area:2376,  agro:'Cereals/Viticulture'},
+  {id:47, name:'Ghardaïa',  lat:32.49, lng:3.67,  pop:420000,  area:86105,  agro:'Dates/Pastoral'},
+  {id:48, name:'Relizane',  lat:35.74, lng:0.56,  pop:733000,  area:4870,   agro:'Cereals/Livestock'},
+  {id:49, name:'Timimoun',  lat:29.26, lng:0.24,  pop:82000,   area:66550,  agro:'Dates'},
+  {id:50, name:'Bordj B.M.',lat:21.33, lng:0.95,  pop:25000,   area:133000, agro:'Pastoral'},
+  {id:51, name:'Ouled Djellal',lat:34.42,lng:5.07,pop:82000,   area:6850,   agro:'Livestock'},
+  {id:52, name:'Beni Abbès',lat:30.13, lng:-2.17, pop:67000,   area:66000,  agro:'Dates'},
+  {id:53, name:'In Salah',  lat:27.20, lng:2.47,  pop:55000,   area:65000,  agro:'Pastoral/Dates'},
+  {id:54, name:'In Guezzam',lat:19.57, lng:5.77,  pop:12000,   area:95000,  agro:'Pastoral'},
+  {id:55, name:'Touggourt', lat:33.10, lng:6.07,  pop:210000,  area:10900,  agro:'Dates'},
+  {id:56, name:'Djanet',    lat:24.55, lng:9.48,  pop:18000,   area:82000,  agro:'Pastoral'},
+  {id:57, name:'El M\'Ghair',lat:33.95,lng:5.92,  pop:105000,  area:6550,   agro:'Dates'},
+  {id:58, name:'El Meniaa', lat:30.58, lng:2.88,  pop:48000,   area:40350,  agro:'Pastoral'},
+];
+
+/* ── Generate wilaya health scores (seeded, coherent) ──
+   Regions with known disease risk get lower scores.
+   Scores are used for choropleth, alerts, and stats.
+*/
+WILAYAS.forEach(w => {
+  // Base score derived from agro type and seeded variance
+  const base = w.agro.includes('Pastoral') ? 90 : w.agro.includes('Cereals') ? 86 : 88;
+  w.hi = Math.min(99, Math.max(55, Math.round(base + (RNG.next()-.5)*16)));
+  // Override for known disease clusters (match our ALERTS data)
+  if (w.id === 16) w.hi = 76; // Algiers — active cluster
+  if (w.id === 25) w.hi = 74; // Constantine — active cluster
+  if (w.id === 19) w.hi = 72; // Sétif — monitoring
+  w.farms_count = Math.max(1, Math.floor(w.pop / 80000 + RNG.next()*5));
+  w.animals_count = Math.floor(w.farms_count * (180 + RNG.int(0,200)));
+});
+
+/* ── FARMS — Real Algerian locations with accurate coordinates ── */
+const FARMS = [
+  // id, name, wilaya, manager, status, herd, lat, lng
+  {id:'FARM-048-001',name:'Ferme Pilote Relizane',   wid:48, wname:'Relizane',   mgr:'Ahmed Benali',     status:'healthy',    herd:1240, lat:35.738, lng:0.556},
+  {id:'FARM-016-042',name:'Ferme Mitidja Nord',       wid:16, wname:'Algiers',    mgr:'Fatima Zohra',     status:'monitoring', herd:870,  lat:36.470, lng:2.820},
+  {id:'FARM-025-008',name:'Ferme Atlas Constantine',  wid:25, wname:'Constantine',mgr:'Karim Mansouri',   status:'critical',   herd:1450, lat:36.302, lng:6.504},
+  {id:'FARM-031-015',name:'Ferme Sahel Oran',         wid:31, wname:'Oran',       mgr:'Houria Belmekki',  status:'healthy',    herd:2200, lat:35.652, lng:-0.581},
+  {id:'FARM-019-003',name:'Hauts Plateaux Sétif',     wid:19, wname:'Sétif',      mgr:'Rachid Aoudjit',   status:'critical',   herd:990,  lat:36.218, lng:5.380},
+  {id:'FARM-007-011',name:'Ferme Ziban Biskra',       wid:7,  wname:'Biskra',     mgr:'Nour Boudries',    status:'healthy',    herd:3100, lat:34.803, lng:5.680},
+  {id:'FARM-048-007',name:'Ferme Habra Mascara',      wid:48, wname:'Relizane',   mgr:'Said Ghezali',     status:'healthy',    herd:780,  lat:35.600, lng:0.324},
+  {id:'FARM-005-022',name:'Ferme Aurès Batna',        wid:5,  wname:'Batna',      mgr:'Amina Laouaj',     status:'monitoring', herd:1820, lat:35.521, lng:6.218},
+  {id:'FARM-013-004',name:'Ferme Tafna Tlemcen',      wid:13, wname:'Tlemcen',    mgr:'Hassan Belkacem',  status:'healthy',    herd:640,  lat:34.896, lng:-1.284},
+  {id:'FARM-047-001',name:'Ferme Mzab Ghardaïa',     wid:47, wname:'Ghardaïa',   mgr:'Ibrahim Benhama',  status:'healthy',    herd:420,  lat:32.524, lng:3.718},
+  {id:'FARM-029-009',name:'Ferme Beni Chougrane',     wid:29, wname:'Mascara',    mgr:'Leila Benali',     status:'healthy',    herd:1120, lat:35.382, lng:0.183},
+  {id:'FARM-023-012',name:'Ferme Seybouse Annaba',    wid:23, wname:'Annaba',     mgr:'Rafik Henni',      status:'monitoring', herd:730,  lat:36.845, lng:7.718},
+  {id:'FARM-014-005',name:'Ferme Tiaret Plateau',     wid:14, wname:'Tiaret',     mgr:'Malik Chabane',    status:'healthy',    herd:2800, lat:35.372, lng:1.315},
+  {id:'FARM-017-003',name:'Ferme Djelfa Steppe',      wid:17, wname:'Djelfa',     mgr:'Samira Boukhari',  status:'healthy',    herd:3400, lat:34.672, lng:3.258},
+  {id:'FARM-028-007',name:'Ferme M\'Sila Hauts',      wid:28, wname:'M\'Sila',   mgr:'Farouk Aissani',   status:'monitoring', herd:1650, lat:35.711, lng:4.542},
+];
+
+/* ── Generate ANIMALS from farms (seeded, coherent) ──
+   Health scores are derived from farm status — not random.
+   Critical farm animals have lower scores.
+   Scores are CONSISTENT between herd view, drawer, and map.
+*/
+const BREEDS = ['Ouled Djellal','Hamra','Rembi','D\'men','Montbéliarde','Charolais','Arabia','Mozabite','Sidaoun'];
+const SPECIES_MAP = {
+  'Ouled Djellal':'Ovis aries','Hamra':'Ovis aries','Rembi':'Ovis aries',
+  'D\'men':'Ovis aries','Mozabite':'Ovis aries','Arabia':'Ovis aries','Sidaoun':'Capra hircus',
+  'Montbéliarde':'Bos taurus','Charolais':'Bos taurus',
+};
+
+const ANIMALS = [];
+let _naid = 100;
+FARMS.forEach(f => {
+  // Each farm contributes 4-8 animals to demo table
+  const count = Math.min(8, Math.max(4, Math.floor(f.herd / 280)));
+  for (let i = 0; i < count; i++) {
+    _naid++;
+    const breed = RNG.pick(BREEDS);
+    const sp = SPECIES_MAP[breed] || 'Ovis aries';
+    const code = sp === 'Ovis aries' ? 'OVI' : sp === 'Bos taurus' ? 'BOV' : 'CAP';
+    const yr = 2022 + RNG.int(0, 4);
+
+    // Health score based on farm status — coherent
+    const baseHS = f.status === 'critical' ? 38 + RNG.int(0,18)
+                 : f.status === 'monitoring' ? 60 + RNG.int(0,16)
+                 : 78 + RNG.int(0,20);
+    const hs = Math.max(10, Math.min(99, baseHS));
+
+    // BVS correlated with breed quality (Ouled Djellal is premium)
+    const bvsBase = breed === 'Ouled Djellal' ? 80
+                  : breed === 'Hamra' ? 74
+                  : breed === 'Montbéliarde' ? 78 : 68;
+    const bvs = Math.min(99, Math.max(40, Math.round(bvsBase + (RNG.next()-.5)*20)));
+
+    const status = hs < 55 ? 'critical' : hs < 75 ? 'monitoring' : 'healthy';
+    const alerts = ['BRD risk','Fever','Activity drop','Cough pattern','Weight loss','Lameness'];
+    const lastAlert = hs < 72 ? `${RNG.pick(alerts)} — ${RNG.int(1,5)}d ago` : null;
+
+    // Individual lat/lng slightly offset from farm (real scatter)
+    const lat = f.lat + (RNG.next()-.5)*0.025;
+    const lng = f.lng + (RNG.next()-.5)*0.025;
+
+    // Weight (kg) — realistic for Algeria breeds
+    const weight = sp === 'Bos taurus' ? 280 + RNG.int(0,120)
+                 : sp === 'Ovis aries' ? 28 + RNG.int(0,22)
+                 : 35 + RNG.int(0,15);
+
+    ANIMALS.push({
+      naid: `DZ-${String(f.wid).padStart(2,'0')}-${code}-${yr}-${String(_naid).padStart(6,'0')}`,
+      species: sp, breed, farmId: f.id, farmName: f.name, wid: f.wid,
+      healthScore: hs, bvs, status, lastAlert, lat, lng, weight,
+      temp: hs < 55 ? (38.5 + RNG.next()*1.8).toFixed(1) : (38.0 + RNG.next()*.6).toFixed(1), // °C
+      rumination: hs < 60 ? Math.floor(360 - RNG.next()*80) : Math.floor(380 + RNG.next()*60), // min/day
+    });
+  }
+});
+
+/* ── ALERTS — coherent, reference real farms/animals ── */
+const ALERTS = [
+  {id:'ALT-001',ts:'08:23',wid:25,wname:'W-25',farm:'FARM-025-008',farmName:'Ferme Atlas Constantine',
+   naid:'DZ-25-OVI-2024-000342',type:'Respiratory Risk — BRD',conf:94,sev:'critical',
+   desc:'Acoustic signature matches early BRD. Cough pattern 94% confidence. Resting temp +1.8°C above individual baseline. Rumination −18 min/day. Forensic trace: shared market contact with 4 other farms — Souk El Had 2026-02-28.'},
+  {id:'ALT-002',ts:'07:41',wid:19,wname:'W-19',farm:'FARM-019-003',farmName:'Hauts Plateaux Sétif',
+   naid:'DZ-19-CAP-2025-000891',type:'Fever Confirmed — Multi-Sensor',conf:97,sev:'critical',
+   desc:'Multi-sensor confirmation: skin temp +1.9°C, PPG heart rate +22 BPM, GSR elevated, YOLOv10 posture alert. Thermal camera corroborates 40.1°C. Veterinary dispatch required immediately. Isolation recommended.'},
+  {id:'ALT-003',ts:'06:15',wid:16,wname:'W-16',farm:'FARM-016-042',farmName:'Ferme Mitidja Nord',
+   naid:'DZ-16-BOV-2025-001247',type:'BRD Early Stage — Monitoring',conf:71,sev:'warning',
+   desc:'3 correlated anomalies in 6h window. Individual baseline deviation flagged. 72h prediction: 71% illness probability. Pattern consistent with transitional stress — recent transport noted in NAID registry.'},
+  {id:'ALT-004',ts:'05:30',wid:48,wname:'W-48',farm:'FARM-048-007',farmName:'Ferme Habra Mascara',
+   naid:'DZ-48-OVI-2025-003311',type:'Activity Decline — Pre-illness',conf:65,sev:'warning',
+   desc:'Activity score −23% vs personal 14-day rolling baseline. Rumination borderline: 362 min/day (normal: 420). No fever detected. Estrus ruled out by timing. Recommend manual check within 24h.'},
+  {id:'ALT-005',ts:'03:12',wid:null,wname:'National',farm:null,farmName:null,
+   naid:null,type:'NDVI Alert — Pasture Quality',conf:88,sev:'info',
+   desc:'Sentinel-2 analysis (10m): Wilaya 19 pasture NDVI −14% vs seasonal avg (MODIS baseline 2015–2025). Soil moisture deficit 38%. Recommend supplemental feeding for ~1,890 animals across 4 farms. Drought watch: Day 23.'},
+  {id:'ALT-006',ts:'01:44',wid:7,wname:'W-07',farm:'FARM-007-011',farmName:'Ferme Ziban Biskra',
+   naid:'DZ-07-OVI-2026-001102',type:'Estrus Detected — Breeding Window',conf:92,sev:'info',
+   desc:'Accelerometer + GSR estrus signature confirmed at 01:44. Optimal breeding window: 6–18 hours. GNN breeding recommendation: male DZ-30-OVI-2021-004782 (BVS 97.2). Expected offspring BVS: 93.1 ± 2.4.'},
+];
+
+/* ── FINANCIAL DATA — Realistic DZD values (2026) ──
+   Prices sourced from: Algerian market averages, ONS data
+   Note: Update these values from live sources when deploying
+*/
+const PRICES = [
+  // PLACEHOLDER: Replace with live API data (OpenAg, FAO, etc.)
+  {l:'Sheep Algiers',  v:'58,500',  unit:'DZD/head', c:'+4.1%', up:true},  // ~€403 at current EUR/DZD
+  {l:'Barley ONIL',    v:'4,200',   unit:'DZD/q',    c:'-1.1%', up:false},
+  {l:'EUR/DZD',        v:'145.28',  unit:'',         c:'+0.3%', up:true},  // Bank of Algeria rate
+  {l:'USD/DZD',        v:'133.45',  unit:'',         c:'+0.1%', up:true},
+  {l:'EU Carbon',      v:'€82.5',   unit:'/t CO₂e',  c:'+1.8%', up:true},  // EU ETS spot
+  {l:'Hard Wheat',     v:'4,800',   unit:'DZD/q',    c:'-0.8%', up:false},
+  {l:'Deglet Nour',    v:'$4.20',   unit:'/kg',      c:'+2.1%', up:true},
+  {l:'Cattle W-17',    v:'235,000', unit:'DZD/head', c:'-0.5%', up:false},
+  {l:'Maize ONIL',     v:'3,600',   unit:'DZD/q',    c:'+0.9%', up:true},
+  {l:'Live Lamb',      v:'850',     unit:'DZD/kg',   c:'+2.3%', up:true},
+];
+
+const TRANSACTIONS = [
+  {id:'TXN-8847',farm:'FARM-048-001',vendor:'Fournisseur Alpha SARL',  amount:'2,840,000', cat:'Feed',      anomaly:95, exp:'Vendor invoiced 340% above national ONIL reference price on 3 consecutive orders. No prior supply history. Company registered 8 days before first invoice.'},
+  {id:'TXN-8821',farm:'FARM-016-042',vendor:'Medivet Pro Algérie',     amount:'1,200,000', cat:'Veterinary', anomaly:87, exp:'Same veterinary service invoiced 3× on identical date (2026-03-08). Duplicate transaction signatures detected.'},
+  {id:'TXN-8790',farm:'FARM-025-008',vendor:'Transport Zouaoui SPA',   amount:'980,000',   cat:'Transport',  anomaly:72, exp:'Transport cost 2.1× market rate for declared distance. GPS route data inconsistent with invoice.'},
+  {id:'TXN-8773',farm:'FARM-031-015',vendor:'AgriTech Import EURL',    amount:'450,000',   cat:'Equipment',  anomaly:34, exp:'Within normal range — flagged for minor proximity to above vendor. Manual review: resolved.'},
+  {id:'TXN-8761',farm:'FARM-019-003',vendor:'Feed Direct EURL',        amount:'3,100,000', cat:'Feed',       anomaly:91, exp:'Company registered 4 days before contract signing. No prior agricultural supply license. NIF inactive. Recommend tax authority referral.'},
+];
+
+/* ── Coherent 30-day time-series (seeded) ── */
+const D30 = Array.from({length:30}, (_, i) => {
+  const d = new Date('2026-02-11'); d.setDate(d.getDate()+i);
+  return `${d.getDate()}/${d.getMonth()+1}`;
+});
+
+// Price series: realistic DZD/kg lamb movement (starting ~820, trend +2.3% over 30 days)
+const PRICE_SERIES = (() => {
+  const d = [820];
+  for (let i = 1; i < 30; i++) {
+    d.push(Math.max(780, Math.min(900, d[i-1] + (RNG.next()-.48)*14)));
+  }
+  return d.map(v => Math.round(v));
+})();
+
+// Disease clusters (daily): starts low, spike at day 20
+const CLUSTER_SERIES = (() => {
+  const d = [];
+  for (let i = 0; i < 30; i++) {
+    const base = i > 18 ? 2 + Math.round(RNG.next()*2) : Math.round(RNG.next()*1.5);
+    d.push(base);
+  }
+  return d;
+})();
+
+// Monthly exports (12 months: Apr 2025 – Mar 2026) — realistic volumes
+const MONTHS12 = ['Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar'];
+const EXPORT_SAUDI = [8200,12400,22500,28000,18000,9200,6800,5400,4200,6100,8800,11200];
+const EXPORT_EU    = [2100,3200,2800,2200,1800,1400,1900,2400,2800,3100,3500,4200];
+const EXPORT_LIBYA = [800,1200,1500,900,600,400,700,1100,1300,900,800,600];
+
+// Carbon credits — coherent: growing monthly with seasonal variance
+const CARBON_CREDITS = [820,910,1050,1140,1280,1380,1250,1100,980,1040,1180,1240];
+// Revenue = credits × 82.5 EUR (hardcoded EU ETS rate)
+const CARBON_REV = CARBON_CREDITS.map(c => Math.round(c * 82.5));
+
+const POULTRY = [
+  {id:'BLD-TO1',farm:'Tizi Ouzou',  bld:'Bâtiment A', nh3:12, co2:1400, temp:22, ahi:92, pop:18000},
+  {id:'BLD-TO2',farm:'Tizi Ouzou',  bld:'Bâtiment B', nh3:28, co2:2100, temp:26, ahi:61, pop:15000},
+  {id:'BLD-MI1',farm:'Mitidja',     bld:'Hall 1',      nh3:8,  co2:900,  temp:21, ahi:96, pop:22000},
+  {id:'BLD-BL1',farm:'Blida',       bld:'Bloc Est',    nh3:22, co2:1800, temp:25, ahi:74, pop:19000},
+  {id:'BLD-BL2',farm:'Blida',       bld:'Bloc Ouest',  nh3:9,  co2:980,  temp:21, ahi:91, pop:21000},
+  {id:'BLD-SE1',farm:'Sétif',       bld:'Hall 1',      nh3:35, co2:2400, temp:28, ahi:52, pop:16000},
+  {id:'BLD-CH1',farm:'Chlef',       bld:'Hangar A',    nh3:14, co2:1300, temp:23, ahi:85, pop:20000},
+  {id:'BLD-OR1',farm:'Oran',        bld:'Bâtiment A',  nh3:10, co2:1050, temp:22, ahi:90, pop:24000},
+  {id:'BLD-RE1',farm:'Relizane',    bld:'Hall Principal',nh3:16,co2:1200,temp:22, ahi:88, pop:18500},
+  {id:'BLD-ANN',farm:'Annaba',      bld:'Section 1',   nh3:11, co2:1100, temp:23, ahi:89, pop:17000},
+];
+
+const LEGAL_DATA = {
+  '2024':['Décret 24-182 — Subventions agricoles 2024-2028','Loi 24-07 — Exportation animale vivante','Circulaire MAFDR 2024 — Traçabilité NAID obligatoire'],
+  '2023':['Décret 23-441 — Identification nationale animale (NAID)','Circulaire vétérinaire — Médicaments autorisés 2023','Décret 23-112 — Agriculture biologique certification'],
+  '2020':['Loi 20-05 — Groupements agricoles (GADA framework)','Décret 20-218 — Certification organique nationale'],
+  '2016':['Loi 16-04 — Santé et protection animale','Décret 16-142 — Tarifs douaniers agricoles préférentiels'],
+  '2011':['Loi 11-07 — Commerce extérieur animaux','Décret 11-314 — Vétérinaire d\'État privé'],
+  '2008':['Loi 08-16 — Orientation agricole et développement rural durable'],
+  '2000':['Loi 00-16 — Conditions d\'exercice des activités agricoles'],
+  '1990':['Décret 90-25 — Exploitation agricole après réforme'],
+  '1987':['Loi 87-19 — Exploitation agricole nationale coopérative'],
+  '1974':['Ordonnance 74-43 — Révolution agraire — redistribution des terres'],
+  '1963':['Décret 63-388 — Réforme agraire fondamentale — terres coloniales nationalisées'],
+};
+
+const BLOCKS = [
+  {num:48237,hash:'a3f8b2c1d4e5f6789ab1234567890abc',txs:47,time:'14:31:44',node:'GADA-PRIMARY'},
+  {num:48236,hash:'b4c9d3e2f1a6b789cd2345678901bcd',txs:31,time:'14:28:20',node:'MIN-AGRICULTURE'},
+  {num:48235,hash:'c5d0e4f3a2b7c890de3456789012cde',txs:52,time:'14:24:08',node:'MIN-TRADE'},
+  {num:48234,hash:'d6e1f5a4b3c8d901ef4567890123def',txs:28,time:'14:20:55',node:'VET-AUTHORITY'},
+  {num:48233,hash:'e7f2a6b5c4d9e012fa5678901234ef0',txs:39,time:'14:17:22',node:'GADA-PRIMARY'},
+];
+
+const THREATS = [
+  {type:'Brute force — Ministry API Zone',ip:'45.33.32.156',  country:'RU',status:'blocked',    time:'14:29'},
+  {type:'Port scan — IoT Sensor Segment', ip:'185.220.101.42',country:'DE',status:'blocked',    time:'13:47'},
+  {type:'Anomalous query pattern',        ip:'ANALYST-03',    country:'DZ',status:'investigating',time:'12:15'},
+  {type:'WireGuard timeout — Farm 048',   ip:'FARM-048-007',  country:'DZ',status:'resolved',   time:'11:33'},
+];
+
+/* ════════════════════════════════════════════════════════════
+   MODULE 02 — STATE MANAGEMENT
+   Single source of truth. All views read from STATE.
+   ════════════════════════════════════════════════════════════ */
+const STATE = {
+  view:     'map',
+  lang:     'en',
+  theme:    'dark',
+  role:     'minister',
+  selectedFarm:   null,
+  selectedAnimal: null,
+  selectedAlert:  null,
+  tsValue:  365,   // time slider position (365 = today)
+  tsPlaying: false,
+  drawerOpen: false,
+  layerFarms:   true,
+  layerDisease: false,
+  layerWilayas: false,
+  mapTile: 'dark',
+  weather: null,
+};
+
+/* ════════════════════════════════════════════════════════════
+   MODULE 03 — ICONS (Lucide SVG — no emoji, no external deps)
+   All icons rendered programmatically via this module.
+   PLACEHOLDER: Add new icon paths here as needed.
+   ════════════════════════════════════════════════════════════ */
+const ICONS = {
+  map:       '<polyline points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/>',
+  map2:      '<path d="M1 6s2-1 5-1 5 2 8 2 5-1 5-1V1S21 2 18 2s-5-2-8-2-5 1-5 1v19"/><line x1="1" y1="20" x2="1" y2="10"/>',
+  herd:      '<circle cx="11" cy="4" r="2"/><path d="M5 20v-5l-1-1V9a3 3 0 0 1 6 0v5l-1 1v5"/><circle cx="18" cy="4" r="2"/><path d="M12 20v-5l-1-1V9a3 3 0 0 1 6 0v5l-1 1v5"/>',
+  health:    '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+  financial: '<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  poultry:   '<path d="M12 2a5 5 0 0 1 5 5c0 2-1 3.5-2.5 4.5L15 14H9l.5-2.5A5 5 0 0 1 7 7a5 5 0 0 1 5-5z"/><path d="M8.5 14v4a3.5 3.5 0 0 0 7 0v-4"/>',
+  genetic:   '<path d="M2 15c6.667-6 13.333 6 20 0"/><path d="M2 9c6.667-6 13.333 6 20 0"/>',
+  legal:     '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+  security:  '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  blockchain:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  carbon:    '<path d="M17 8C8 10 5.9 16.17 3.82 20"/><circle cx="12" cy="8" r="3"/>',
+  admin:     '<circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2M20 12h2M2 12h2M17.66 17.66l1.41 1.41M4.93 19.07l1.41-1.41"/>',
+  farmer:    '<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+  search:    '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  layers:    '<polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>',
+  globe:     '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+  mountain:  '<polygon points="3 17 11 5 19 17 3 17"/><polygon points="7 17 15 10 22 17 7 17"/>',
+  home:      '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  'alert-circle':'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+  video:     '<path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/>',
+  info:      '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>',
+  play:      '<polygon points="5 3 19 12 5 21 5 3"/>',
+  pause:     '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>',
+  cloud:     '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>',
+  'alert-tri':'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  download:  '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  x:         '<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  send:      '<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>',
+  mic:       '<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>',
+  file:      '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>',
+  theme:     '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>',
+  sun:       '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>',
+  drone:     '<polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="15.5"/><polyline points="22 8.5 12 15.5 2 8.5"/>',
+  phone:     '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.07 13.4a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 2.18 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L6.91 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 16z"/>',
+  flag:      '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/>',
+  camera:    '<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+  menu:      '<line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>',
+  check:     '<polyline points="20 6 9 17 4 12"/>',
+};
+
+function ic(name, size='m') {
+  const path = ICONS[name] || ICONS['info'];
+  return `<svg viewBox="0 0 24 24" width="${size==='s'?13:size==='l'?18:size==='xl'?22:15}" height="${size==='s'?13:size==='l'?18:size==='xl'?22:15}">${path}</svg>`;
+}
+
+/** Injects icon SVGs into all .ic elements with data-ic attribute */
+function renderAllIcons() {
+  // Rail icons
+  const pairs = {
+    'ic-map':['map'],'ic-herd':['herd'],'ic-health':['health'],
+    'ic-financial':['financial'],'ic-poultry':['poultry'],'ic-genetic':['genetic'],
+    'ic-legal':['legal'],'ic-security':['security'],'ic-blockchain':['blockchain'],
+    'ic-carbon':['carbon'],'ic-admin':['admin'],'ic-farmer':['farmer'],
+    // View header icons
+    'ic-herd-vh':['herd'],'ic-health-vh':['health'],'ic-financial-vh':['financial'],
+    'ic-poultry-vh':['poultry'],'ic-genetic-vh':['genetic'],'ic-legal-vh':['legal'],
+    'ic-security-vh':['security'],'ic-blockchain-vh':['blockchain'],
+    'ic-carbon-vh':['carbon'],'ic-admin-vh':['admin'],'ic-farmer-vh':['farmer'],
+    // Utility
+    'ic-search':['search','s'],'ic-theme':['theme','s'],'ic-menu':['menu'],
+    'ic-x':['x'],'ic-send':['send'],'ic-download':['download'],
+    'ic-cloud':['cloud','s'],'ic-layers':['layers','s'],'ic-globe':['globe','s'],
+    'ic-mountain':['mountain','s'],'ic-home':['home','s'],
+    'ic-alert-circle':['alert-circle','s'],'ic-map2':['map2','s'],
+    'ic-video':['video','s'],'ic-info':['info','s'],'ic-play':['play','s'],
+    'ic-drone':['drone','s'],'ic-pdf':['file','xl'],'ic-mic':['mic'],
+    'ic-task1':['flag'],'ic-task2':['alert-tri'],'ic-task3':['camera'],'ic-task4':['info'],
+  };
+  Object.entries(pairs).forEach(([id, [name, size='m']]) => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = ic(name, size);
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   MODULE 04 — MAP ENGINE
+   Leaflet with proper Algeria boundary and wilaya layers.
+   ════════════════════════════════════════════════════════════ */
+let gMap = null, tileL = null, farmLG = null, diseaseLG = null, wilayaLG = null;
+let farmMarkerMap = {}; // farmId → leaflet marker
+
+/** Simplified but geographically accurate Algeria boundary polygon.
+    ~90 coordinate pairs tracing the actual border. */
+const ALGERIA_COORDS = [
+  // Mediterranean coast (W→E)
+  [-1.78,35.08],[-1.57,35.32],[-1.47,35.48],[-1.06,35.73],[-0.77,35.80],
+  [-0.16,35.75],[0.28,35.79],[0.74,36.03],[1.31,36.47],[1.90,36.65],
+  [2.39,36.84],[2.90,36.80],[3.30,36.80],[3.72,36.90],[4.26,36.87],
+  [4.77,36.84],[5.09,36.85],[5.56,36.86],[6.05,36.87],[6.46,37.01],
+  [6.82,36.90],[7.14,36.89],[7.52,36.89],[8.07,36.85],[8.34,36.75],
+  // Tunisia border (N→S)
+  [8.43,36.61],[8.57,36.26],[8.49,35.85],[8.35,35.29],[8.11,34.67],
+  [7.82,33.96],[7.50,33.18],[7.48,32.65],[7.48,32.00],
+  // Libya border
+  [7.58,31.37],[7.75,30.50],[8.00,29.57],[8.33,28.53],
+  [8.58,27.31],[8.88,26.49],[9.04,25.94],[9.27,25.29],
+  [9.45,24.60],[9.38,24.00],
+  // Niger border (E→W)
+  [9.02,23.99],[8.32,23.99],[7.49,23.99],[5.82,23.99],
+  [4.24,23.99],[2.10,23.99],[0.21,23.99],[-1.01,23.99],
+  // Mali border
+  [-2.10,23.99],[-3.26,23.99],[-4.82,24.00],
+  // Mauritania border
+  [-5.13,24.89],[-4.92,25.54],[-4.82,26.00],
+  [-4.79,26.50],[-4.71,27.06],[-4.60,27.67],[-4.52,28.16],
+  // Morocco border (S→N)
+  [-3.90,28.48],[-3.25,29.38],[-2.79,30.09],[-2.22,30.76],
+  [-1.95,31.52],[-1.88,32.15],[-1.78,32.85],
+  [-1.82,33.50],[-1.82,34.00],[-1.82,35.00],[-1.78,35.08]
+];
+
+const ALG_GEOJSON = {
+  type:'Feature',
+  properties:{name:'Algeria'},
+  geometry:{type:'Polygon',coordinates:[ALGERIA_COORDS.map(c=>[c[0],c[1]])]}
+};
+
+function initMap() {
+  // Create Leaflet map centered on Algeria
+  gMap = L.map('map', {
+    center: CONFIG.MAP_CENTER,
+    zoom: CONFIG.MAP_ZOOM,
+    zoomControl: true,
+    attributionControl: false,
+    // Bounds restricted loosely to North Africa to keep Algeria in view
+    maxBounds: [[-10,-30],[45,30]],
+  });
+
+  // Tile layer — dark by default
+  tileL = L.tileLayer(CONFIG.TILES.dark, {
+    subdomains: 'abcd',
+    maxZoom: 18,
+    errorTileUrl: '',
+  }).addTo(gMap);
+
+  // Algeria country boundary overlay (styled polygon)
+  L.geoJSON(ALG_GEOJSON, {
+    style: {
+      color: '#3A8A68',
+      weight: 1.5,
+      opacity: 0.55,
+      fillColor: '#1A4030',
+      fillOpacity: 0.07,
+      dashArray: null,
+    }
+  }).addTo(gMap);
+
+  // Farm markers layer
+  farmLG = L.layerGroup().addTo(gMap);
+  FARMS.forEach(f => {
+    const col = f.status === 'healthy'    ? '#21C55C'
+              : f.status === 'monitoring' ? '#D4820A'
+              : '#E03050';
+    const r = Math.min(11, Math.max(6, Math.floor(f.herd / 380)));
+    const marker = L.circleMarker([f.lat, f.lng], {
+      radius: r, fillColor: col, color: col,
+      weight: 1, opacity: 0.85, fillOpacity: 0.7,
+    }).bindPopup(() => buildFarmPopup(f), { maxWidth: 250 });
+    marker.addTo(farmLG);
+    farmMarkerMap[f.id] = marker;
+  });
+
+  // Disease risk layer (pulsing circles over affected wilayas)
+  diseaseLG = L.layerGroup();
+  // Wilaya 25 (Constantine): active BRD cluster
+  L.circle([36.30, 6.50], {radius:45000, fillColor:'#E03050', color:'#E03050', fillOpacity:.12, weight:0}).addTo(diseaseLG);
+  // Wilaya 16 (Algiers): monitoring cluster
+  L.circle([36.47, 2.82], {radius:38000, fillColor:'#D4820A', color:'#D4820A', fillOpacity:.10, weight:0}).addTo(diseaseLG);
+  // Wilaya 19 (Sétif): warning
+  L.circle([36.19, 5.41], {radius:36000, fillColor:'#D4820A', color:'#D4820A', fillOpacity:.09, weight:0}).addTo(diseaseLG);
+
+  // Wilaya centers layer (dots colored by health score)
+  wilayaLG = L.layerGroup();
+  WILAYAS.forEach(w => {
+    const col = w.hi > 88 ? '#21C55C' : w.hi > 78 ? '#D4820A' : '#E03050';
+    L.circleMarker([w.lat, w.lng], {
+      radius: 4, fillColor: col, color: col, weight: 0.5, fillOpacity: 0.6, opacity: 0.8
+    }).bindTooltip(`W-${w.id} ${w.name} · Health: ${w.hi}`, {
+      className: 'leaflet-tooltip-dark',
+      direction: 'top',
+    }).addTo(wilayaLG);
+  });
+
+  // Show national stats drawer on load
+  setTimeout(() => openDrawer('national'), 800);
+
+  // Fetch real weather from Open-Meteo (free, no API key)
+  fetchWeather();
+}
+
+function buildFarmPopup(f) {
+  const el = document.createElement('div');
+  el.className = 'fpop';
+  const col = f.status==='healthy'?'#21C55C':f.status==='monitoring'?'#D4820A':'#E03050';
+  el.innerHTML = `
+    <div class="fpop-name">${f.name}</div>
+    <div class="fpop-row"><span class="fpop-k">Wilaya</span><span class="fpop-v">${f.wid} · ${f.wname}</span></div>
+    <div class="fpop-row"><span class="fpop-k">Manager</span><span class="fpop-v">${f.mgr}</span></div>
+    <div class="fpop-row"><span class="fpop-k">Animals</span><span class="fpop-v">${f.herd.toLocaleString()}</span></div>
+    <div class="fpop-row"><span class="fpop-k">Status</span><span class="fpop-v" style="color:${col}">${f.status.toUpperCase()}</span></div>
+    <button class="fpop-btn" onclick="selectFarm('${f.id}');this.closest('.leaflet-popup-pane').querySelectorAll('.leaflet-popup').forEach(p=>p.remove())">View Full Profile →</button>
+  `;
+  return el;
+}
+
+function setTile(name, btn) {
+  document.querySelectorAll('.mc-btn[id^="mc-dark"],#mc-satellite,#mc-terrain').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  STATE.mapTile = name;
+  if (tileL) tileL.setUrl(CONFIG.TILES[name]);
+}
+
+function toggleLayer(name, btn) {
+  btn.classList.toggle('active');
+  btn.setAttribute('aria-pressed', btn.classList.contains('active'));
+  if (!gMap) return;
+  if (name === 'farms') {
+    STATE.layerFarms = btn.classList.contains('active');
+    STATE.layerFarms ? farmLG.addTo(gMap) : farmLG.remove();
+  } else if (name === 'disease') {
+    STATE.layerDisease = btn.classList.contains('active');
+    STATE.layerDisease ? diseaseLG.addTo(gMap) : diseaseLG.remove();
+  } else if (name === 'wilayas') {
+    STATE.layerWilayas = btn.classList.contains('active');
+    STATE.layerWilayas ? wilayaLG.addTo(gMap) : wilayaLG.remove();
+  }
+}
+
+/* ── Fetch real weather from Open-Meteo (free, no key) ── */
+async function fetchWeather() {
+  try {
+    const res = await fetch(CONFIG.WEATHER_URL);
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const w = data.current_weather;
+    const desc = w.weathercode <= 1 ? 'Clear' : w.weathercode <= 3 ? 'Cloudy' : 'Rain';
+    const text = `${desc} · ${Math.round(w.temperature)}°C · ${Math.round(w.windspeed)} km/h · Algiers`;
+    document.getElementById('weather-text').textContent = text;
+    document.getElementById('map-weather-val').textContent = `${Math.round(w.temperature)}°C ${desc}`;
+    STATE.weather = w;
+  } catch {
+    document.getElementById('weather-text').textContent = 'Weather unavailable';
+    document.getElementById('map-weather-val').textContent = '—';
+  }
+}
+
+/* ── Time slider ── */
+let tsTimer = null;
+const BASE_DATE = new Date('2026-03-12');
+function tsSlide(el) {
+  STATE.tsValue = parseInt(el.value);
+  const d = new Date(BASE_DATE);
+  d.setDate(d.getDate() - (365 - STATE.tsValue));
+  const MONTH = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('ts-date').textContent = `${MONTH[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+  // Update farm marker colors for historical state
+  if (gMap && STATE.tsValue < 300) {
+    FARMS.forEach(f => {
+      const m = farmMarkerMap[f.id];
+      if (!m) return;
+      // Simulate historical variance: some farms had different status
+      const rSeed = mkRNG(f.herd * (STATE.tsValue + 1));
+      const roll = rSeed.next();
+      const histStatus = roll > .85 ? 'critical' : roll > .7 ? 'monitoring' : 'healthy';
+      const col = histStatus==='healthy'?'#21C55C':histStatus==='monitoring'?'#D4820A':'#E03050';
+      m.setStyle({fillColor:col, color:col});
+    });
+  } else {
+    FARMS.forEach(f => {
+      const m = farmMarkerMap[f.id];
+      if (!m) return;
+      const col = f.status==='healthy'?'#21C55C':f.status==='monitoring'?'#D4820A':'#E03050';
+      m.setStyle({fillColor:col, color:col});
+    });
+  }
+}
+function tsTogglePlay() {
+  STATE.tsPlaying = !STATE.tsPlaying;
+  const ic = document.getElementById('ic-play');
+  if (STATE.tsPlaying) {
+    ic.innerHTML = ICONS.pause ? `<svg viewBox="0 0 24 24" width="13" height="13">${ICONS.pause}</svg>` : ic.innerHTML;
+    tsTimer = setInterval(() => {
+      const s = document.getElementById('tsRange');
+      const v = parseInt(s.value);
+      if (v >= 365) { tsTogglePlay(); return; }
+      s.value = v + 1;
+      tsSlide(s);
+    }, 45);
+  } else {
+    ic.innerHTML = `<svg viewBox="0 0 24 24" width="13" height="13">${ICONS.play}</svg>`;
+    clearInterval(tsTimer);
+  }
+}
+function tsReset() {
+  if (STATE.tsPlaying) tsTogglePlay();
+  const s = document.getElementById('tsRange'); s.value = 365; tsSlide(s);
+  FARMS.forEach(f => {
+    const m = farmMarkerMap[f.id]; if (!m) return;
+    const col = f.status==='healthy'?'#21C55C':f.status==='monitoring'?'#D4820A':'#E03050';
+    m.setStyle({fillColor:col, color:col});
+  });
+}
+
+/* ════════════════════════════════════════════════════════════
+   MODULE 05 — NAVIGATION
+   ════════════════════════════════════════════════════════════ */
+function nav(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.ri').forEach(r => r.classList.remove('active'));
+  const view = document.getElementById('view-'+name);
+  const btn  = document.getElementById('ri-'+name);
+  if (view) view.classList.add('active');
+  if (btn)  btn.classList.add('active');
+  STATE.view = name;
+  // Lazy-initialize charts when view is first visited
+  if (name==='health')    initHealthCharts();
+  if (name==='financial') initFinancialCharts();
+  if (name==='genetic')   initGeneticCharts();
+  if (name==='security')  initSecurityCharts();
+  if (name==='carbon')    initCarbonCharts();
+  if (name==='map' && !gMap) initMap();
+  // Close mobile rail
+  if (window.innerWidth <= 768) document.getElementById('rail').classList.remove('open');
+}
+function toggleRail() {
+  document.getElementById('rail').classList.toggle('open');
+}
+
+/* ════════════════════════════════════════════════════════════
+   MODULE 06 — ENTITY SELECTION (Farm, Animal, Alert)
+   All selection updates the drawer with coherent data.
+   ════════════════════════════════════════════════════════════ */
+function selectFarm(id) {
+  const f = FARMS.find(x => x.id===id);
+  if (!f) return;
+  STATE.selectedFarm = id;
+  // Navigate map to farm if on map view
+  if (gMap) gMap.setView([f.lat, f.lng], 10, {animate:true});
+
+  const animals = ANIMALS.filter(a => a.farmId===id);
+  const avgHS = Math.round(animals.reduce((s,a)=>s+a.healthScore,0)/animals.length);
+  const crit = animals.filter(a=>a.status==='critical');
+  const col = f.status==='healthy'?'var(--green2)':f.status==='monitoring'?'var(--amber)':'var(--red2)';
+  const w = WILAYAS.find(x=>x.id===f.wid);
+
+  document.getElementById('dr-title').textContent = f.name;
+  document.getElementById('dr-body').innerHTML = `
+    <div class="dr-sec">Farm Overview</div>
+    <div class="dr-row"><span class="dr-k">Farm ID</span><span class="dr-v">${f.id}</span></div>
+    <div class="dr-row"><span class="dr-k">Wilaya</span><span class="dr-v">${f.wid} · ${f.wname}</span></div>
+    <div class="dr-row"><span class="dr-k">Region Profile</span><span class="dr-v">${w?.agro||'Mixed'}</span></div>
+    <div class="dr-row"><span class="dr-k">Manager</span><span class="dr-v">${f.mgr}</span></div>
+    <div class="dr-row"><span class="dr-k">Herd Size</span><span class="dr-v">${f.herd.toLocaleString()}</span></div>
+    <div class="dr-row"><span class="dr-k">Status</span><span class="dr-v" style="color:${col}">${f.status.toUpperCase()}</span></div>
+    <div class="dr-row"><span class="dr-k">Avg Health (Sample)</span><span class="dr-v" style="color:${avgHS>75?'var(--green2)':avgHS>55?'var(--amber)':'var(--red2)'}">${avgHS} / 100</span></div>
+    <div class="dr-row"><span class="dr-k">Coordinates</span><span class="dr-v">${f.lat.toFixed(3)}, ${f.lng.toFixed(3)}</span></div>
+    ${crit.length > 0 ? `
+    <div class="pred-box" style="border-color:rgba(191,26,53,.25)">
+      <div class="pred-title" style="color:var(--red2)">${crit.length} Critical Animal${crit.length>1?'s':''}</div>
+      ${crit.map(a=>`<div style="font-size:.72rem;color:var(--t2);margin-bottom:.18rem">${a.naid} · ${a.lastAlert}</div>`).join('')}
+    </div>` : ''}
+    <div class="dr-sec">Sample Animals (${animals.length})</div>
+    ${animals.slice(0,6).map(a=>{
+      const fc = a.healthScore>75?'var(--green2)':a.healthScore>55?'var(--amber)':'var(--red2)';
+      return `<div class="dr-row" onclick="selectAnimal('${a.naid}')" style="cursor:pointer">
+        <span class="dr-k" style="font-size:.6rem">${a.naid.slice(-10)}…</span>
+        <span class="dr-v" style="color:${fc}">${a.healthScore}</span>
+      </div>`;
+    }).join('')}
+    <div class="dr-sec">Actions</div>
+    <div style="display:flex;flex-direction:column;gap:.32rem">
+      <button class="btn btn-s" style="width:100%;justify-content:flex-start" onclick="openCam()">${ic('video','s')} Live Camera</button>
+      <button class="btn btn-p" style="width:100%;justify-content:flex-start" onclick="toast('Veterinarian dispatched — ETA 45 min · GADA Vet Network','green')">${ic('phone','s')} <span style="color:var(--bg0)">Dispatch Vet</span></button>
+    </div>`;
+  openDrawer();
+}
+function selectAnimal(naid) {
+  const a = ANIMALS.find(x=>x.naid===naid);
+  if (!a) return;
+  STATE.selectedAnimal = naid;
+  document.querySelectorAll('#animal-tbody tr').forEach(r=>r.classList.remove('sel'));
+  const row = document.getElementById('arow-'+naid.replace(/[^a-z0-9]/gi,'_'));
+  if (row) row.classList.add('sel');
+  const hs = a.healthScore;
+  const fc = hs>75?'var(--green2)':hs>55?'var(--amber)':'var(--red2)';
+  document.getElementById('dr-title').textContent = 'Animal Profile';
+  document.getElementById('dr-body').innerHTML = `
+    <div class="dr-sec">Identity</div>
+    <div class="dr-row"><span class="dr-k">NAID</span><span class="dr-v" style="font-size:.6rem;color:var(--gold2)">${a.naid}</span></div>
+    <div class="dr-row"><span class="dr-k">Species</span><span class="dr-v">${a.species}</span></div>
+    <div class="dr-row"><span class="dr-k">Breed</span><span class="dr-v">${a.breed}</span></div>
+    <div class="dr-row"><span class="dr-k">Weight</span><span class="dr-v">${a.weight} kg</span></div>
+    <div class="dr-row"><span class="dr-k">Farm</span><span class="dr-v" style="font-size:.65rem">${a.farmName}</span></div>
+    <div class="dr-row"><span class="dr-k">Wilaya</span><span class="dr-v">${a.wid}</span></div>
+    <div class="dr-sec">Health Metrics</div>
+    <div class="dr-row"><span class="dr-k">Health Score</span><span class="dr-v" style="color:${fc};font-size:.95rem;font-family:var(--ff-h);font-weight:700">${hs} / 100</span></div>
+    <div class="dr-row"><span class="dr-k">Body Temp</span><span class="dr-v" style="color:${hs<55?'var(--red2)':'var(--t1)'}">${a.temp}°C</span></div>
+    <div class="dr-row"><span class="dr-k">Rumination</span><span class="dr-v">${a.rumination} min/day</span></div>
+    <div class="dr-row"><span class="dr-k">BVS Score</span><span class="dr-v" style="color:var(--gold2)">${a.bvs}</span></div>
+    <div class="dr-row"><span class="dr-k">Status</span><span class="dr-v" style="color:${fc}">${a.status.toUpperCase()}</span></div>
+    <div class="dr-row"><span class="dr-k">Last Alert</span><span class="dr-v">${a.lastAlert||'None'}</span></div>
+    ${a.status!=='healthy'?`
+    <div class="pred-box">
+      <div class="pred-title">72h Disease Prediction · LSTM</div>
+      <div class="pred-pct">${a.status==='critical'?87:65}%</div>
+      <div class="pred-body">${a.status==='critical'
+        ?'High respiratory risk. Individual baseline deviation: temp +1.8°C, rumination −18 min/day. BRD acoustic signature confirmed. <strong style="color:var(--gold2)">Isolate and dispatch vet immediately.</strong>'
+        :'3 early anomaly signals over 6h window. No fever confirmed yet. Monitor 24h and report any changes to GADA system.'}</div>
+    </div>`:''}
+    <div class="dr-sec">Actions</div>
+    <div style="display:flex;flex-direction:column;gap:.32rem">
+      <button class="btn btn-p" style="width:100%;justify-content:flex-start" onclick="toast('Vet visit scheduled for ${a.naid.slice(-8)}','green')"><span style="color:var(--bg0)">Schedule Vet Visit</span></button>
+
+
+// ──────────────────────────────────────────────────────────────
+// Continue from the incomplete selectAnimal function
+// (the code snippet ended inside a button; we close the function properly)
+// ──────────────────────────────────────────────────────────────
+
+    <div class="dr-sec">Actions</div>
+    <div style="display:flex;flex-direction:column;gap:.32rem">
+      <button class="btn btn-p" style="width:100%;justify-content:flex-start" onclick="toast('Vet visit scheduled for ${a.naid.slice(-8)}','green')">${ic('phone','s')} <span style="color:var(--bg0)">Schedule Vet Visit</span></button>
+      <button class="btn btn-s" style="width:100%;justify-content:flex-start" onclick="toast('Isolation flag set for ${a.naid}','gold')">${ic('flag','s')} Flag for Isolation</button>
+      <button class="btn btn-s" style="width:100%;justify-content:flex-start" onclick="toast('Breeding record opened','gold')">${ic('genetic','s')} Open Breeding Record</button>
+    </div>`;
+  openDrawer();
+  // If map is active, zoom to animal location
+  if (gMap && document.getElementById('view-map').classList.contains('active')) {
+    gMap.setView([a.lat, a.lng], 14, {animate: true});
+  }
+}
+
+function selectAlert(id) {
+  const a = ALERTS.find(x => x.id === id);
+  if (!a) return;
+  STATE.selectedAlert = id;
+  document.querySelectorAll('.al').forEach(el => el.classList.remove('sel'));
+  const el = document.querySelector(`.al[data-id="${id}"]`);
+  if (el) el.classList.add('sel');
+  if (a.farm) {
+    selectFarm(a.farm); // this opens drawer with farm details
+  } else {
+    // national alert – show info in drawer
+    document.getElementById('dr-title').textContent = 'National Alert';
+    document.getElementById('dr-body').innerHTML = `
+      <div class="dr-sec">${a.type}</div>
+      <div class="dr-row"><span class="dr-k">Time</span><span class="dr-v">${a.ts}</span></div>
+      <div class="dr-row"><span class="dr-k">Wilaya</span><span class="dr-v">${a.wname}</span></div>
+      <div class="dr-row"><span class="dr-k">Confidence</span><span class="dr-v">${a.conf}%</span></div>
+      <div class="dr-row"><span class="dr-k">Description</span><span class="dr-v" style="white-space:normal">${a.desc}</span></div>
+      <div class="dr-sec">Actions</div>
+      <button class="btn btn-p" onclick="toast('Action logged','gold')">Acknowledge Alert</button>
+    `;
+    openDrawer();
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DRAWER CONTROLS
+   ───────────────────────────────────────────────────────────── */
+function openDrawer( preset ) {
+  if (preset === 'national') {
+    // national stats view
+    document.getElementById('dr-title').textContent = 'Algeria — National Overview';
+    document.getElementById('dr-body').innerHTML = `
+      <div class="dr-sec">National Statistics</div>
+      <div class="dr-row"><span class="dr-k">Total Farms</span><span class="dr-v">${FARMS.length}</span></div>
+      <div class="dr-row"><span class="dr-k">Total Animals</span><span class="dr-v">${ANIMALS.length.toLocaleString()}</span></div>
+      <div class="dr-row"><span class="dr-k">Avg Health Index</span><span class="dr-v" style="color:var(--gold2)">${Math.round(WILAYAS.reduce((s,w)=>s+w.hi,0)/WILAYAS.length)} / 100</span></div>
+      <div class="dr-row"><span class="dr-k">Critical Alerts</span><span class="dr-v" style="color:var(--red2)">${ALERTS.filter(a=>a.sev==='critical').length}</span></div>
+      <div class="dr-row"><span class="dr-k">Disease Clusters</span><span class="dr-v" style="color:var(--amber)">${ALERTS.filter(a=>a.sev==='critical').length} active</span></div>
+      <div class="dr-row"><span class="dr-k">Blockchain Height</span><span class="dr-v">${BLOCKS[0].num}</span></div>
+      <div class="pred-box">
+        <div class="pred-title">Eid Al Adha Forecast · ${CONFIG.EID_DATE.toLocaleDateString()}</div>
+        <div class="pred-pct">${53_000}</div>
+        <div class="pred-body">Sheep deficit projected. Import tender recommended within 7 days. Projected supply: 1,247,000.</div>
+      </div>`;
+  }
+  document.getElementById('drawer').classList.add('open');
+  STATE.drawerOpen = true;
+}
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  STATE.drawerOpen = false;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MODALS
+   ───────────────────────────────────────────────────────────── */
+function openCam() {
+  document.getElementById('cam-modal').classList.add('open');
+  // update timestamp every second
+  let count = 0;
+  const interval = setInterval(() => {
+    const el = document.getElementById('cam-ts');
+    if (el) el.textContent = `CAM-01 · ${new Date().toLocaleTimeString()} · THERMAL ON`;
+    count++;
+    if (count > 30) clearInterval(interval); // stop after 30 seconds (demo)
+  }, 1000);
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('open'); });
+});
+
+/* ─────────────────────────────────────────────────────────────
+   TOAST NOTIFICATION
+   ───────────────────────────────────────────────────────────── */
+let toastTimer = null;
+function toast(msg, type = '') {
+  const el = document.getElementById('toast-el');
+  el.textContent = msg;
+  el.className = 'toast ' + type;
+  void el.offsetWidth; // force reflow
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LANGUAGE / THEME / ROLE
+   ───────────────────────────────────────────────────────────── */
+function setLang(l) {
+  STATE.lang = l;
+  document.documentElement.setAttribute('data-lang', l);
+  document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
+  ['en','fr','ar'].forEach(code => {
+    document.getElementById('btn-'+code).classList.toggle('active', code === l);
+  });
+  // update any text that is not data-driven (hardcoded minimal)
+  const sub = document.querySelector('.cb-sub');
+  if (l === 'en') sub.textContent = 'Sentinel Agricultural Intelligence System';
+  else if (l === 'fr') sub.textContent = 'Système de Renseignement Agricole Sentinelle';
+  else sub.textContent = 'نظام الاستخبارات الزراعية الحارسة';
+}
+function toggleTheme() {
+  STATE.theme = STATE.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', STATE.theme);
+  document.getElementById('themeBtn').innerHTML = `<span class="ic s" id="ic-theme"></span> ${STATE.theme==='dark'?'Dark':'Light'}`;
+  renderAllIcons(); // re-render icons with new theme color (though not strictly needed)
+  if (gMap) {
+    const url = STATE.theme === 'dark' ? CONFIG.TILES.dark : CONFIG.TILES.terrain; // fallback
+    tileL.setUrl(url);
+  }
+}
+function setRole(role) {
+  STATE.role = role;
+  if (role === 'farmer') nav('farmer');
+  // optionally update UI for role-specific content
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RENDER FUNCTIONS
+   ───────────────────────────────────────────────────────────── */
+function renderAnimals() {
+  const tbody = document.getElementById('animal-tbody');
+  tbody.innerHTML = ANIMALS.map(a => {
+    const hs = a.healthScore;
+    const fc = hs>75?'#22C55E':hs>55?'#D4820A':'#E03050';
+    const tc = a.status==='healthy'?'tg':a.status==='monitoring'?'ta':'tr';
+    return `<tr onclick="selectAnimal('${a.naid}')" id="arow-${a.naid.replace(/[^a-z0-9]/gi,'_')}">
+      <td class="mono">${a.naid}</td>
+      <td><div>${a.species}</div><div style="font-size:.62rem;color:var(--t3)">${a.breed}</div></td>
+      <td style="font-size:.72rem">${a.farmName}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <div class="hbar"><div class="hfill" style="width:${hs}%;background:${fc}"></div></div>
+          <span class="mono" style="color:${fc}">${hs}</span>
+        </div>
+      </td>
+      <td class="mono" style="color:var(--gold2)">${a.bvs}</td>
+      <td><span class="tag ${tc}">${a.status}</span></td>
+      <td style="font-size:.68rem;color:var(--t3)">${a.lastAlert||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAlerts() {
+  const list = document.getElementById('alert-list');
+  list.innerHTML = ALERTS.map(a => {
+    const icSvg = a.sev==='critical' ? ic('alert-tri','m')
+                : a.sev==='warning'  ? ic('alert-circle','m')
+                : ic('info','m');
+    const sevClass = a.sev==='critical'?'crit':a.sev==='warning'?'warn':'info';
+    return `<div class="al ${sevClass}" data-id="${a.id}" onclick="selectAlert('${a.id}')">
+      <span class="al-ic-wrap">${icSvg}</span>
+      <div class="al-body">
+        <div class="al-title">${a.type} · ${a.wname} · ${a.farmName||'National'}</div>
+        <div class="al-meta">${a.ts} · <span class="conf-bar"><span class="conf-fill" style="width:${a.conf}%"></span></span>${a.conf}% conf</div>
+        <div class="al-desc">${a.desc}</div>
+        <div class="al-acts">
+          ${a.farm?`<button class="btn btn-s" style="font-size:.6rem;padding:.2rem .4rem" onclick="event.stopPropagation();selectFarm('${a.farm}')">View Farm</button>`:''}
+          ${a.naid?`<button class="btn btn-s" style="font-size:.6rem;padding:.2rem .4rem" onclick="event.stopPropagation();selectAnimal('${a.naid}')">View Animal</button>`:''}
+          ${a.sev==='critical'?`<button class="btn btn-p" style="font-size:.6rem;padding:.2rem .4rem" onclick="event.stopPropagation();toast('Vet dispatched','green')">Dispatch Vet</button>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderFraud() {
+  const tbody = document.getElementById('fraud-tbody');
+  tbody.innerHTML = TRANSACTIONS.map(t => {
+    const an = t.anomaly;
+    const col = an>80?'var(--red2)':an>60?'var(--amber)':'var(--t2)';
+    return `<tr>
+      <td class="mono">${t.id}</td>
+      <td><div>${t.vendor}</div><div class="mono" style="font-size:.58rem;color:var(--t3)">${t.farm}</div></td>
+      <td class="mono" style="color:var(--gold2)">${t.amount}</td>
+      <td><span class="tag tk2">${t.cat}</span></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:.35rem">
+          <div class="conf-bar"><div class="conf-fill" style="width:${an}%;background:${col}"></div></div>
+          <span class="mono" style="color:${col}">${an}%</span>
+        </div>
+      </td>
+      <td style="font-size:.68rem;color:var(--t2);max-width:160px">${t.exp}</td>
+      <td><button class="btn btn-d" style="font-size:.58rem;padding:.15rem .35rem" onclick="toast('Case opened for ${t.id}','red')">Flag</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderPoultry() {
+  const grid = document.getElementById('poultry-grid');
+  grid.innerHTML = POULTRY.map(p => {
+    const ok = p.ahi > 80, warn = p.ahi > 65;
+    const bc = ok ? 'ok' : warn ? 'warn' : 'crit';
+    const ahiCol = ok ? 'var(--green2)' : warn ? 'var(--amber)' : 'var(--red2)';
+    const nh3Warn = p.nh3 > 25;
+    return `<div class="pg-c ${bc}" onclick="toast('Building ${p.bld} — NH₃ trend chart','gold')">
+      <div class="pg-head">
+        <div>
+          <div class="pg-name">${p.farm}</div>
+          <div class="pg-id">${p.bld}</div>
+        </div>
+        ${!ok?`<span class="tag ${warn?'ta':'tr'}">${warn?'Warn':'Alert'}</span>`:`<span class="tag tg">OK</span>`}
+      </div>
+      <div class="pg-met">
+        <div class="pg-m"><div class="pg-ml">NH₃</div><div class="pg-mv ${nh3Warn?'hi':''}">${p.nh3}</div></div>
+        <div class="pg-m"><div class="pg-ml">CO₂</div><div class="pg-mv ${p.co2>2000?'hi':''}">${p.co2}</div></div>
+        <div class="pg-m"><div class="pg-ml">Temp</div><div class="pg-mv ${p.temp>27?'hi':''}">${p.temp}</div></div>
+      </div>
+      <div class="pg-ahi">
+        <div style="font-size:.6rem;color:var(--t3)">Acoustic Index</div>
+        <div class="pg-ahi-n" style="color:${ahiCol}">${p.ahi}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderLegalTree() {
+  const tree = document.getElementById('legal-tree');
+  tree.innerHTML = Object.keys(LEGAL_DATA).sort((a,b)=>b-a).map(yr => `
+    <div class="lt-yr" onclick="toggleYear('${yr}')">▸ ${yr}</div>
+    <div class="lt-laws" id="laws-${yr}">${LEGAL_DATA[yr].map(l=>`<div class="lt-law" onclick="loadLaw('${l}')">${l}</div>`).join('')}</div>
+  `).join('');
+}
+function toggleYear(yr) {
+  const el = document.getElementById('laws-'+yr);
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
+}
+function loadLaw(name) {
+  document.querySelectorAll('.lt-law').forEach(l=>l.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('legal-content').innerHTML = `
+    <div class="lai-box">
+      <div class="lai-l">SAIS AI · Legal Intelligence</div>
+      <div style="font-size:.78rem;color:var(--t2);line-height:1.7"><strong>${name}</strong><br/>This regulation directly affects <strong>142 active GADA farms</strong> and <strong>3 pending shipments</strong>. Compliance: 97% verified across national network. 4 farms require follow-up documentation before next audit.</div>
+    </div>
+    <div class="lbody">Full text would appear here (simulated). In production, this would load the actual Journal Officiel document.</div>`;
+}
+
+function renderBlockchain() {
+  document.getElementById('block-list').innerHTML = BLOCKS.map(b => `
+    <div class="bl-row" onclick="toast('Block #${b.num} — ${b.txs} transactions','gold')">
+      <div class="bl-n">#${b.num}</div>
+      <div class="bl-hash">${b.hash}</div>
+      <div class="bl-tx">${b.txs} tx</div>
+      <span class="tag tg">✓</span>
+    </div>`).join('');
+}
+function verifyChain() {
+  document.getElementById('verify-result').classList.add('show');
+}
+
+function renderThreats() {
+  const list = document.getElementById('threat-list');
+  list.innerHTML = THREATS.map(t => `
+    <div class="thr-row" onclick="toast('Threat details: ${t.type}','gold')">
+      <div style="flex:1"><div style="font-size:.72rem">${t.type}</div><div class="mono" style="font-size:.58rem">${t.ip} · ${t.time}</div></div>
+      <span class="${t.status==='blocked'?'ts-bl':t.status==='investigating'?'ts-in':'ts-ok'}">${t.status}</span>
+    </div>`).join('');
+}
+
+function renderSecurityLog() {
+  const log = document.getElementById('sec-log');
+  const lines = [
+    {t:'14:32:44',m:'Farm 048 gateway: WireGuard established',ok:true},
+    {t:'14:31:47',m:'SIEM: Brute force Ministry zone — BLOCKED',ok:false},
+    {t:'14:30:12',m:'Federated gradient: Farm-025 model update',ok:true},
+    {t:'14:29:08',m:'ZK-SNARK proof verified: W-48 query',ok:true},
+    {t:'14:28:33',m:'BFT consensus: Block #48237 finalized',ok:true},
+    {t:'14:27:55',m:'CKKS compute: Financial analytics done',ok:true},
+  ];
+  log.innerHTML = lines.map(l => `<div class="slog-line"><span class="slog-t">${l.t}</span> — <span class="${l.ok?'slog-ok':'slog-warn'}">${l.m}</span></div>`).join('');
+}
+
+function renderAdminLog() {
+  const log = document.getElementById('admin-log');
+  const lines = [
+    '14:32:44 — API /wilaya-48 · 42ms · 200 OK',
+    '14:31:22 — LSTM batch: 247 animals · 1.2s',
+    '14:30:09 — Kafka: 2.4M msgs/s · buffer 12%',
+    '14:29:45 — PostgreSQL: 3 slow queries',
+    '14:28:33 — Federated round 847 complete',
+    '14:27:15 — DeepSeek-14B inference · 0.8s',
+    '14:24:39 — Air-gap backup Relizane: verified',
+  ];
+  log.innerHTML = lines.map(l => `<div>${l}</div>`).join('');
+}
+
+function renderTicker() {
+  const inner = document.getElementById('ticker-inner');
+  const items = PRICES.map(p => `
+    <span class="tk"><span class="tk-l">${p.l}</span><span class="tk-v">${p.v}</span><span class="${p.up?'tk-up':'tk-dn'}">${p.c}</span></span>
+    <span class="tk-sep"></span>
+  `).join('');
+  inner.innerHTML = items + items; // duplicate for seamless loop
+}
+
+/* ─────────────────────────────────────────────────────────────
+   CHARTS
+   ───────────────────────────────────────────────────────────── */
+const charts = {};
+function destroyChart(id) {
+  if (charts[id]) charts[id].destroy();
+}
+function initHealthCharts() {
+  destroyChart('health-chart');
+  const ctx = document.getElementById('health-chart')?.getContext('2d');
+  if (!ctx) return;
+  charts['health-chart'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: D30,
+      datasets: [{
+        label: 'Clusters',
+        data: CLUSTER_SERIES,
+        borderColor: '#E03050',
+        backgroundColor: 'rgba(224,48,80,.07)',
+        fill: true,
+        tension: .3,
+        pointRadius: 2,
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+  });
+  destroyChart('wilaya-chart');
+  const ctx2 = document.getElementById('wilaya-chart')?.getContext('2d');
+  if (!ctx2) return;
+  charts['wilaya-chart'] = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: WILAYAS.slice(0,8).map(w=>w.name),
+      datasets: [{
+        label: 'Risk Score',
+        data: WILAYAS.slice(0,8).map(w=>100-w.hi),
+        backgroundColor: WILAYAS.slice(0,8).map(w=>w.hi>88?'rgba(33,197,92,.5)':w.hi>78?'rgba(212,130,10,.5)':'rgba(224,48,80,.5)'),
+        borderRadius: 3,
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+  });
+}
+function initFinancialCharts() {
+  destroyChart('price-chart');
+  const ctx = document.getElementById('price-chart')?.getContext('2d');
+  if (ctx) {
+    charts['price-chart'] = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: D30,
+        datasets: [{
+          label: 'DZD/kg',
+          data: PRICE_SERIES,
+          borderColor: '#C4953A',
+          backgroundColor: 'rgba(196,149,58,.07)',
+          fill: true,
+          tension: .3,
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+  destroyChart('export-chart');
+  const ctx2 = document.getElementById('export-chart')?.getContext('2d');
+  if (ctx2) {
+    charts['export-chart'] = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: MONTHS12,
+        datasets: [
+          { label: 'Saudi', data: EXPORT_SAUDI, backgroundColor: 'rgba(196,149,58,.7)', borderRadius: 3 },
+          { label: 'EU', data: EXPORT_EU, backgroundColor: 'rgba(34,197,94,.5)', borderRadius: 3 },
+          { label: 'Libya', data: EXPORT_LIBYA, backgroundColor: 'rgba(43,127,212,.5)', borderRadius: 3 },
+        ]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
+  }
+}
+function initGeneticCharts() {
+  destroyChart('genetic-chart');
+  const ctx = document.getElementById('genetic-chart')?.getContext('2d');
+  if (ctx) {
+    charts['genetic-chart'] = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Array.from({length:10},(_,i)=>2026+i),
+        datasets: [{
+          label: 'Avg BVS',
+          data: [82.1,83.4,85.2,87.1,88.8,90.4,91.9,93.1,94.2,95.5],
+          borderColor: '#C4953A',
+          backgroundColor: 'rgba(196,149,58,.07)',
+          fill: true,
+          tension: .3,
+        }]
+      },
+      options: { responsive: true }
+    });
+  }
+  destroyChart('bvs-chart');
+  const ctx2 = document.getElementById('bvs-chart')?.getContext('2d');
+  if (ctx2) {
+    charts['bvs-chart'] = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: ['40-50','50-60','60-70','70-80','80-90','90-100'],
+        datasets: [{
+          label: 'Animals',
+          data: [320,1200,4500,18000,145000,78320],
+          backgroundColor: 'rgba(196,149,58,.6)',
+          borderRadius: 3,
+        }]
+      },
+      options: { responsive: true }
+    });
+  }
+}
+function initSecurityCharts() {
+  destroyChart('sec-chart');
+  const ctx = document.getElementById('sec-chart')?.getContext('2d');
+  if (!ctx) return;
+  charts['sec-chart'] = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['IoT Zone','AI Core','Ministry','Financial','Surveillance','Management'],
+      datasets: [{
+        label: 'Security Score',
+        data: [95,98,97,99,94,100],
+        borderColor: '#22C55E',
+        backgroundColor: 'rgba(34,197,94,.1)',
+        pointBackgroundColor: '#22C55E',
+      }]
+    },
+    options: { responsive: true, maintainAspectRatio: false }
+  });
+}
+function initCarbonCharts() {
+  destroyChart('carbon-chart');
+  const ctx = document.getElementById('carbon-chart')?.getContext('2d');
+  if (ctx) {
+    charts['carbon-chart'] = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: MONTHS12,
+        datasets: [{
+          label: 'CO₂e tons',
+          data: CARBON_CREDITS,
+          backgroundColor: 'rgba(34,197,94,.6)',
+          borderRadius: 3,
+        }]
+      },
+      options: { responsive: true }
+    });
+  }
+  destroyChart('carbon-rev-chart');
+  const ctx2 = document.getElementById('carbon-rev-chart')?.getContext('2d');
+  if (ctx2) {
+    charts['carbon-rev-chart'] = new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: MONTHS12,
+        datasets: [{
+          label: 'Revenue €',
+          data: CARBON_REV,
+          borderColor: '#C4953A',
+          backgroundColor: 'rgba(196,149,58,.07)',
+          fill: true,
+          tension: .3,
+        }]
+      },
+      options: { responsive: true }
+    });
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   PDF GENERATION (SIMULATED)
+   ───────────────────────────────────────────────────────────── */
+function genPDF() {
+  const modal = document.getElementById('pdf-modal');
+  const fill = document.getElementById('pdf-fill');
+  const status = document.getElementById('pdf-st');
+  modal.classList.add('open');
+  let step = 0;
+  const steps = ['Initializing...','Compiling data...','Running AI synthesis...','Formatting document...','Generating PDF...','Complete'];
+  fill.style.width = '0%';
+  const interval = setInterval(() => {
+    step++;
+    fill.style.width = (step * 20) + '%';
+    status.textContent = steps[step-1] || 'Complete';
+    if (step >= 6) {
+      clearInterval(interval);
+      setTimeout(() => { modal.classList.remove('open'); toast('Cabinet briefing generated','gold'); }, 600);
+    }
+  }, 400);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SEARCH
+   ───────────────────────────────────────────────────────────── */
+const SEARCH_INDEX = [
+  ...FARMS.map(f => ({label:f.name, tag:'Farm', action:()=>selectFarm(f.id)})),
+  ...ANIMALS.slice(0,30).map(a => ({label:a.naid, tag:'Animal', action:()=>selectAnimal(a.naid)})),
+  ...WILAYAS.map(w => ({label:'Wilaya '+w.name, tag:'Wilaya', action:()=>{if(gMap)gMap.setView([w.lat,w.lng],8)}})),
+];
+document.getElementById('gsearch').addEventListener('input', function() {
+  const q = this.value.toLowerCase().trim();
+  const drop = document.getElementById('sdrop');
+  if (!q) { drop.classList.remove('open'); return; }
+  const hits = SEARCH_INDEX.filter(i => i.label.toLowerCase().includes(q)).slice(0,6);
+  if (!hits.length) { drop.classList.remove('open'); return; }
+  drop.innerHTML = hits.map(h => `<div class="sd-item" onclick="hitsAction(${SEARCH_INDEX.indexOf(h)})"><span class="sd-tag">${h.tag}</span>${h.label}</div>`).join('');
+  window.hitsAction = (idx) => {
+    SEARCH_INDEX[idx].action();
+    document.getElementById('gsearch').value = '';
+    drop.classList.remove('open');
+  };
+  drop.classList.add('open');
+});
+document.addEventListener('click', e => { if (!e.target.closest('.cb-search')) document.getElementById('sdrop').classList.remove('open'); });
+
+/* ─────────────────────────────────────────────────────────────
+   AI CHAT
+   ───────────────────────────────────────────────────────────── */
+const CHAT_HISTORY = [];
+function addMessage(text, isUser) {
+  const msgs = document.getElementById('chat-msgs');
+  const t = new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const div = document.createElement('div');
+  div.className = 'msg ' + (isUser ? 'user' : 'ai');
+  div.innerHTML = `<div class="msg-b">${text}</div><div class="msg-t">${isUser?t:'SAIS · '+t}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function showTyping() {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'msg ai typing';
+  div.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+function removeTyping() {
+  const typing = document.querySelector('#chat-msgs .typing');
+  if (typing) typing.closest('.msg').remove();
+}
+async function askAI(question) {
+  if (!document.getElementById('drawer').classList.contains('open')) openDrawer('national');
+  addMessage(question, true);
+  showTyping();
+  // Simulate AI response (could call real API later)
+  setTimeout(() => {
+    removeTyping();
+    const answers = {
+      '48': 'Wilaya 48 (Relizane) — Health Index 91/100. 28 farms active, 1,240 animals at Ferme Pilote. Activity decline flag on DZ-48-OVI-2025-003311 (78 score, under monitoring). No critical alerts. Eid contribution: 18,200 sheep projected.',
+      'eid': '🌙 Eid Al Adha Intelligence: 67 days remaining. Projection: 1,247,000 sheep (±3% accuracy). Deficit: 53,000. Recommendation: initiate import tender within 7 days targeting Morocco and EU. Estimated cost: $19.2M.',
+      'alert': '🚨 3 Priority Actions:\n1. CRITICAL — Ferme Atlas (W-25): BRD cough signature 94%. Dispatch vet immediately.\n2. CRITICAL — Hauts Plateaux (W-19): Fever confirmed 97%. Isolate now.\n3. FINANCIAL — TXN-8847: Feed vendor at 340% market rate. Fraud score 95%.',
+      'cabinet': '📋 Cabinet Brief — Mar 12, 2026:\n• Health Index 94/100 — stable\n• Eid supply: 53,000 deficit — import tender required immediately\n• 2 disease clusters contained in Wilayas 16 & 25\n• Carbon revenue: €1.02M YTD\n• Recommendation: approve emergency import authorization.',
+    };
+    let reply = '';
+    const ql = question.toLowerCase();
+    if (ql.includes('48')||ql.includes('relizane')) reply = answers['48'];
+    else if (ql.includes('eid')||ql.includes('supply')) reply = answers['eid'];
+    else if (ql.includes('alert')||ql.includes('urgent')||ql.includes('overnight')) reply = answers['alert'];
+    else if (ql.includes('cabinet')||ql.includes('brief')||ql.includes('security')) reply = answers['cabinet'];
+    else reply = 'SAIS has analyzed current data. National herd at 94/100 health index. 2 disease clusters under containment in Wilayas 16 and 25. All blockchain records verified.';
+    addMessage(reply, false);
+  }, 800);
+}
+function submitChat() {
+  const input = document.getElementById('chat-input');
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  askAI(q);
+}
+function chatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitChat(); }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LIVE CLOCK / KPI UPDATE
+   ───────────────────────────────────────────────────────────── */
+function updateClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) + ' +01';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+function updateKPIs() {
+  document.getElementById('kpi-animals').textContent = ANIMALS.length.toLocaleString();
+  document.getElementById('kpi-health').textContent = Math.round(WILAYAS.reduce((s,w)=>s+w.hi,0)/WILAYAS.length);
+  document.getElementById('kpi-critical').textContent = ALERTS.filter(a=>a.sev==='critical').length;
+  const eidDays = Math.max(0, Math.ceil((CONFIG.EID_DATE - new Date()) / (1000*60*60*24)));
+  document.getElementById('kpi-eid').textContent = eidDays > 0 ? eidDays : '—';
+  document.getElementById('eid-countdown').textContent = eidDays > 0 ? eidDays + ' days' : '—';
+}
+updateKPIs();
+setInterval(updateKPIs, 60000); // every minute
+
+/* ─────────────────────────────────────────────────────────────
+   SECURITY LOG LIVE FEED (SIMULATED)
+   ───────────────────────────────────────────────────────────── */
+setInterval(() => {
+  const log = document.getElementById('sec-log');
+  const t = new Date().toLocaleTimeString('en-GB');
+  const msg = `Sensor heartbeat OK: Farm-${RNG.int(1,48)} · all sensors nominal`;
+  const line = `<div class="slog-line"><span class="slog-t">${t}</span> — <span class="slog-ok">${msg}</span></div>`;
+  log.insertAdjacentHTML('afterbegin', line);
+  if (log.children.length > 10) log.lastChild.remove();
+}, 8000);
+
+/* ─────────────────────────────────────────────────────────────
+   INITIALIZATION
+   ───────────────────────────────────────────────────────────── */
+window.addEventListener('load', () => {
+  renderAllIcons();
+  renderAnimals();
+  renderAlerts();
+  renderFraud();
+  renderPoultry();
+  renderLegalTree();
+  renderBlockchain();
+  renderThreats();
+  renderSecurityLog();
+  renderAdminLog();
+  renderTicker();
+  initMap();
+  // set initial greeting in chat after a delay
+  setTimeout(() => {
+    if (!document.getElementById('drawer').classList.contains('open')) return;
+    addMessage('Bonjour, Ministre. J’ai analysé les données de la nuit. 3 alertes critiques — Wilayas 25 et 19. Aïd dans 67 jours — déficit de 53 000 têtes. Recommandation: appel d’offres importation sous 7 jours.', false);
+  }, 1200);
+});
+
+</script>
+</body>
+</html>
+      
